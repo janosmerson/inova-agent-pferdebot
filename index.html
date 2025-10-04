@@ -9,51 +9,34 @@
   <h1>Willkommen im Stall</h1>
   <p>Klick unten rechts für den Bot-Assistenten!</p>
 
-  <!-- InovaAgent Chat Widget – kleinere Buttons, Shopify-stabil (fehlerfrei) -->
+  <!-- InovaAgent Chat Widget – kleinere Buttons, Shopify-stabil (fehlerfrei, Minimal-Modus) -->
   <script>
   (function(){
-    /* ---------------- CONFIG (pferde-spezifisch angepasst) ---------------- */
+    /* ---------------- CONFIG (pferde-spezifisch, Minimal-Modus) ---------------- */
     var CONFIG = {
       BRAND: "Alex – Pferdepensionsstall Assistent",
-      SUBTITLE: "Ich helfe bei Stall-Fragen: Boxen, Termine, Koppelstatus & mehr. Lass uns starten!",
+      SUBTITLE: "Nur für Mitglieder: Koppelstatus prüfen. Passwort vom Stallbesitzer.",
       WIDGET_SIDE: "right",
       BADGE_TEXT: "Neue Nachricht • Jetzt ansehen",
-      GREETING: "Hallo, ich bin Alex. Willkommen im Stall! 🐎\nFragen zu Boxen, Terminen oder Koppel? Ich helfe 24/7.\nProbier's aus!",
-      CALENDLY: "https://calendly.com/DEIN-STALL/30min",
-      EMAIL: "info@dein-stall.de",
-      WHATSAPP: "https://wa.me/4917099999999?text=Hi%2C%20ich%20m%C3%B6chte%20eine%20Demo%20eures%20Chatbots.",
-      API_BASE: "https://api.bot-flow.net",
+      GREETING: "Hallo, ich bin Alex. Willkommen im Mitgliederbereich! 🐎\nGib dein Passwort ein, um den Koppelstatus zu sehen.",
+      CALENDLY: "https://calendly.com/DEIN-STALL/30min",  // Deinen Link
+      EMAIL: "info@dein-stall.de",  // Deine E-Mail
+      WHATSAPP: "https://wa.me/49170DEINNUMMER?text=Hi%2C%20ich%20habe%20eine%20Frage%20zum%20STALL.",
+      API_BASE: "https://deine-vercel-app.vercel.app/api",  // Deine Vercel-URL /api
       SHOW_BADGE_ON_LOAD: true,
       BADGE_SESSION_KEY: "bf_badge_shown",
       z: 2147483000,
       FAQ_OPTIONS: [
         {
           label: "Welche Boxentypen bieten Sie an?",
-          answer: 'Die einmalige Einrichtung inkl. individueller Anpassung, Design, Integration und Testphase kostet <strong>350,00–450,00&nbsp;€</strong> (abhängig vom Funktionsumfang).<br>' +
-                  'Dazu kommt eine <strong>monatliche Service- und Betriebspauschale von 400,00&nbsp;€</strong>.<br><br>' +
-                  'Diese Pauschale deckt alle laufenden Leistungen ab:' +
-                  '<ul style="margin:8px 0 0 18px">' +
-                  '<li>Betrieb & Hosting des virtuellen Agenten</li>' +
-                  '<li>DSGVO-konforme Datenverarbeitung & Sicherheitsupdates</li>' +
-                  '<li>Überwachung & Fehlerbehebung</li>' +
-                  '<li>Laufende Optimierung bei Bedarf</li>' +
-                  '<li>Monatliches Performance-Monitoring</li>' +
-                  '<li>Bereitstellung ausführlicher Monatsberichte</li>' +
-                  '<li>Persönlicher Support</li>' +
-                  '</ul>'
+          answer: 'Wir haben <strong>Vollpension</strong> (Futter & Pflege inkl., ab 450 €/Monat), <strong>Halbpension</strong> (Teilselbstversorger, ab 300 €) und <strong>Offenstall</strong> (Gruppenhaltung, ab 250 €). Alle Boxen sind wetterfest und sauber.<br><br>Kontaktieren Sie uns für Details!'
         },
-        { label: "Wie lange dauert die Einrichtung?", answer: "In der Regel <strong>3–5 Werktage</strong> nach Bereitstellung Ihrer Inhalte. Bei komplexeren Projekten kann es etwas länger dauern." },
-        { label: "Welche Vorteile hat der virtuelle Agent?", answer: "Ihr virtueller Agent beantwortet häufig gestellte Fragen, sammelt Kontaktdaten, empfiehlt Produkte oder Dienstleistungen und leitet qualifizierte Leads direkt an Sie weiter – <strong>automatisch, 24/7 und DSGVO-konform</strong>." },
-        { label: "Für welche Unternehmen ist ein virtueller Agent sinnvoll?", answer: "Besonders für <strong>Hausverwaltungen, Autohäuser und Hotels</strong>. Grundsätzlich profitieren jedoch alle Unternehmen mit vielen Kundenanfragen oder Terminbuchungen, z.&nbsp;B. <strong>Arztpraxen, Dienstleister oder Online-Shops</strong>." },
-        { label: "Ist der virtuelle Agent DSGVO-konform?", answer: "Ja, der virtuelle Agent ist <strong>DSGVO-konform</strong>.<br>Ihre Daten werden nicht dauerhaft gespeichert, sondern ausschließlich zur Weiterleitung genutzt. Die Verarbeitung erfolgt nach den geltenden Datenschutzbestimmungen." },
-        { label: "Kann das Design angepasst werden?", answer: "Ja. <strong>Farben, Logo, Schriftarten und Texte</strong> werden komplett auf Ihre Marke abgestimmt, damit der Chatbot wie ein Teil Ihrer Website wirkt." },
-        { label: "Muss ich dafür technische Kenntnisse haben?", answer: "Nein. <strong>Wir übernehmen Einrichtung, Anpassung, Wartung und Optimierung</strong> – Sie konzentrieren sich auf Ihr Geschäft." },
-        { label: "Gibt es eine Vertragslaufzeit?", answer: "Ja. Wir arbeiten mit einer <strong>Mindestlaufzeit von 6 Monaten</strong>. Danach können Sie jederzeit kündigen." },
-        { label: "Wer hilft mir, wenn es Probleme gibt?", answer: "Unser <strong>Support</strong> steht Ihnen jederzeit per E-Mail oder Telefon zur Verfügung. <strong>Updates und Optimierungen</strong> sind inklusive." },
-        { label: "Kann ich den virtuellen Agenten später erweitern?", answer: "Ja. Sie können jederzeit neue <strong>Fragen, Funktionen oder Integrationen</strong> hinzufügen – wir kümmern uns um die Umsetzung." }
+        { label: "Wie funktioniert die Warteliste?", answer: "Bei ausgebuchten Boxen tragen wir Sie auf die Warteliste ein. Bei Freigabe melden wir uns per E-Mail oder WhatsApp – priorisiert nach Anmeldedatum." },
+        { label: "Ist der Stall DSGVO-konform?", answer: "Ja, alle Daten (z. B. für Termine/Leads) werden EU-weit gesichert und nur mit Einwilligung verarbeitet. Keine Weitergabe an Dritte." },
+        { label: "Kann ich eine Besichtigung buchen?", answer: "Gerne! Wählen Sie einen Termin – ich leite Sie zu Calendly weiter. Alternativ: Rufen Sie an." },
+        { label: "Was kostet eine Koppelbuchung?", answer: "Koppelzugriff für Mitglieder: 50 €/Monat (inkl. Status-Updates). Für Gäste: 10 €/Tag." }
       ],
-      /* Zieladresse für die Buchungs-Mail */
-      BOOKING_NOTIFY_EMAIL: "contact@bot-flow.net"
+      BOOKING_NOTIFY_EMAIL: "info@dein-stall.de"
     };
 
     /* ---------------- STYLES ---------------- */
@@ -63,18 +46,14 @@
       '.bf-reset,.bf-reset *{box-sizing:border-box;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:geometricPrecision}' +
       ':root{--c-bg:#0b0f14;--c-panel:#10151c;--c-header:#0e131a;--c-border:#232a34;--c-muted:#8b95a7;--c-text:#e8edf5;--c-bubble:#1b2230;--c-bubble-2:#202838;--c-user:#4a86ff;--shadow:0 20px 40px rgba(0,0,0,.45),0 6px 16px rgba(0,0,0,.35)}' +
       '.bf-widget{position:fixed;bottom:16px;right:16px;z-index:'+CONFIG.z+'}' +
-      /* FAB – hellblaues Icon wie im Screenshot */
       '.bf-fab{width:56px;height:56px;border-radius:999px;border:none;background:#b7dbff;color:#0f1b24;display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow);position:relative;transition:transform .08s ease, background .2s ease}' +
       '.bf-fab:hover{background:#a8d2ff}' +
       '.bf-fab:active{transform:scale(.98)}' +
       '.bf-fab svg{width:26px;height:26px;display:block}' +
-      /* Info-Dot ausgeblendet */
       '.bf-dot{display:none}' +
-      /* >>> überarbeitete Ein-Zeilen-Mitteilung mit Pfeil <<< */
       '.bf-badge{position:absolute;bottom:76px;right:-6px;background:#b7dbff;color:#0f1b24;border:none;border-radius:12px;padding:8px 12px;font-size:14px;line-height:1;font-weight:600;box-shadow:var(--shadow);white-space:nowrap;display:none}.bf-badge.show{display:block}' +
       '.bf-badge::after{content:"";position:absolute;right:16px;bottom:-6px;width:12px;height:12px;background:#b7dbff;transform:rotate(45deg);border-bottom-right-radius:2px}' +
       '.bf-panel{position:fixed;bottom:84px;right:16px;width:380px;max-width:calc(100vw - 32px);background:var(--c-panel);border:1px solid var(--c-border);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);display:none}.bf-panel.open{display:block}' +
-      /* Header + einklappbarer Untertitel */
       '.bf-header{background:var(--c-header);color:var(--c-text);padding:12px 14px;border-bottom:1px solid var(--c-border);display:flex;gap:10px;align-items:center;justify-content:space-between;user-select:none}' +
       '.bf-header.bf-click{cursor:pointer}' +
       '.bf-head{display:flex;gap:10px;align-items:center;min-width:0}.bf-avatar{width:30px;height:30px;border-radius:999px;background:#1f2937;display:grid;place-items:center;font-weight:700;font-size:14px;color:#fff}' +
@@ -87,26 +66,20 @@
       '.bf-row{display:flex;gap:8px;margin-bottom:10px;align-items:flex-end}.bf-row.bot{justify-content:flex-start}.bf-row.user{justify-content:flex-end}' +
       '.bf-bubble{background:var(--c-bubble);border:1px solid var(--c-border);padding:12px 14px;border-radius:16px;max-width:86%;line-height:1.55;font-size:15px;color:var(--c-text)}' +
       '.bf-bubble.bot{background:var(--c-bubble-2)}.bf-bubble.user{background:#4a86ff;color:#fff}' +
-      /* kleinere Buttons */
       '.bf-buttons{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}.bf-buttons .bf-btn.chosen{margin-top:16px}' +
-      /* === EINHEITLICHE BUTTON-FARBE + HOVER === */
       '.bf-btn{border:1px solid #2d3a52;background:#26334b;color:#cfe0ff;padding:6px 10px;border-radius:999px;font-size:13px;cursor:pointer;line-height:1.2;transition:background .2s ease,border-color .2s ease}' +
       '.bf-btn:hover{background:#314260;border-color:#3b4f6f}' +
       '.bf-btn.primary{background:#26334b;border-color:#2d3a52;color:#cfe0ff;font-weight:600}' +
       '.bf-btn.primary:hover{background:#314260;border-color:#3b4f6f}' +
-      /* Header-Buttons (Refresh/Close) noch etwas kompakter */
       '.bf-actions .bf-btn{padding:4px 8px;font-size:12px;background:#26334b;border-color:#2d3a52;color:#cfe0ff}' +
       '.bf-actions .bf-btn:hover{background:#314260;border-color:#3b4f6f}' +
-      /* kleinerer CTA unten */
       '.bf-footer{border-top:1px solid var(--c-border);background:#0e131a;padding:10px;display:flex;gap:8px}' +
       '.bf-cta{flex:1;height:38px;border-radius:10px;border:none;background:#26334b;color:#cfe0ff;font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.25);transition:background .2s ease}'+
       '.bf-cta:hover{background:#314260}' +
-      /* Select (FAQ) */
       '.bf-select-wrap{position:relative;margin-top:10px}' +
       '.bf-select{-webkit-appearance:none;-moz-appearance:none;appearance:none;background:#0f141b;border:1px solid var(--c-border);color:#0bd;border-radius:12px;height:46px;width:100%;padding:0 42px 0 14px;font-size:15px;line-height:46px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);background-image:none;-webkit-tap-highlight-color:transparent;color-scheme:dark}' +
       '.bf-select:focus{outline:none;border-color:#4a86ff;box-shadow:0 0 0 3px rgba(74,134,255,.35)}' +
       '.bf-select-wrap:after{content:"▾";position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:#9aa3b2;font-size:16px}' +
-      /* >>> Inputzeile + klickbarer Enter-Button <<< */
       '.bf-inputrow{margin-top:10px;display:flex;gap:8px;align-items:center;position:relative}'+
       '.bf-input{flex:1;background:#0f141b;border:1px solid var(--c-border);color:var(--c-text);padding:10px 42px 10px 12px;border-radius:12px;font-size:15px;line-height:1.2}'+
       '.bf-input:focus{outline:none;border-color:#4a86ff;box-shadow:0 0 0 3px rgba(74,134,255,.25)}'+
@@ -241,7 +214,7 @@
       var label = formatDateTimeDE(startLike);
       var subj  = "Neuer Termin von " + (booking.name || "Neuer Kontakt");
 
-      var bookingText = `Hallo Team von InovaAgent,
+      var bookingText = `Hallo Team vom Stall,
 
 der Chatbot hat einen Termin am ${label} in Ihrem Kalender eingetragen.
 
@@ -251,7 +224,7 @@ Anliegen: ${booking.concern || '-'}
 Tel. Nr.: ${booking.phone || '-'}
 
 Mit freundlichen Grüßen
-Ihr InovaAgent-Agent`;
+Ihr Bot-Assistent`;
 
       fetch(CONFIG.API_BASE + "/api/send-lead?template=booking", {
         method: "POST",
@@ -470,139 +443,78 @@ Ihr InovaAgent-Agent`;
       bubbleBot(CONFIG.GREETING.replace(/\n/g,"<br>"));
       bubbleBot("<strong>Wobei kann ich Ihnen helfen?</strong>");
       addButtons([
-        { label:"Häufige Fragen (FAQ)",onClick:viewFAQ },
-        { label:"Möchten Sie ein Angebot?",onClick:viewOffer, primary:true },
-        { label:"Über den Stall",onClick:viewAbout }
+        { label:"Koppelstatus (Mitglieder)",onClick:viewPaddockStatus },  // Minimal-Modus: Nur das
+        { label:"Schließen",onClick:closePanel }
       ]);
     }
 
-    /* ---- Über den Stall ---- */
-    function backButtons(){
-      addButtons([
-        { label:"Zurück zum Hauptmenü",onClick:renderHome },
-        { label:'Zurück zum "Über den Stall" Menü', onClick:viewAbout },
-        { label:"Das wäre alles, Dankeschön",onClick:function(){ bubbleBot("Sehr gerne! Wenn Sie später Fragen haben, bin ich hier. 😊"); } }
-      ]);
-    }
-    function viewAbout(){
-      bubbleBot("Dieser Teil erzählt vom Stall. 😊");
-      bubbleBot("Hallo! 👋<br>Schön, dass Sie hier sind. Ich helfe Ihnen gerne dabei, mehr über unseren Hof zu erfahren.<br><br>Was möchten Sie wissen? 🐎");
-      viewAboutMenu();
-    }
-    function viewAboutMenu(){
-      addButtons([
-        { label:"Unsere Boxen",onClick:showMission },
-        { label:"Unser Service",onClick:showService },
-        { label:"Vorteile für Pferde",onClick:showBenefits }
-      ]);
-    }
-    function showMission(){
-      bubbleBot("<strong>Unsere Boxen 🎯</strong><br><br>Wir bieten sichere, saubere Boxen für Voll- und Halbpension. Alles für das Wohlbefinden Ihres Pferdes.");
-      backButtons();
-    }
-    function showService(){
-      bubbleBot("<strong>Unser Service 🤖</strong><br><br>24/7 Support, Futter, Pflege und Koppelzugriff – alles inklusive.");
-      backButtons();
-    }
-    function showBenefits(){
-      bubbleBot("<strong>Vorteile für Pferde✨</strong><br><br>Grüne Koppeln, Reithalle und Tierarzt-Standby – für gesunde Pferde.");
-      backButtons();
-    }
-
-    /* ============== Angebot / Lead-Erfassung ============== */
-    function viewOffer(){
-      bubbleBot("Bevor wir fortfahren, habe ich ein paar kurze Fragen, um sicherzustellen, dass unser Stall optimal zu Ihnen passt.<br><br><strong>Welche Art von Stall suchen Sie?</strong>");
-      showTextInput({
-        placeholder: "z. B. Vollpension, Halbpension, Offenstall …",
-        onSubmit: function(val){
-          lead.company = val;
-          leadIntro();
-          return false;
-        }
-      });
-    }
-
-    function leadIntro(){
-      bubbleBot("Das klingt, als würden Sie sehr gut zu uns passen! 🐎<br><br>Gerne nehmen wir Ihre Kontaktdaten auf, um Ihnen Infos zu schicken.");
-      bubbleBot("Nennen Sie mir bitte Ihren Vor- und Nachnamen.");
-      askForNameThenEmailAndFeatures();
-    }
-
-    function askForNameThenEmailAndFeatures(){
-      showTextInput({
-        placeholder:"Vor- und Nachnamen eingeben…",
-        onSubmit:function(name, input, row){
-          lead.name = name;
-          row.remove();
-          bubbleBot("Nennen Sie mir bitte Ihre E-Mail Adresse.");
-          showTextInput({
-            placeholder:"E-Mail Adresse eingeben…",
-            onSubmit:function(email, input2, row2){
-              lead.email = email;
-              row2.remove();
-
-              bubbleBot("Sagen Sie mir in Stichpunkten, welche Funktionen Ihrem Pferd helfen würden.");
-              showTextInput({
-                placeholder:"Funktionen (Stichpunkte) eingeben…",
-                onSubmit:function(features,input3, row3){
-                  lead.features = features;
-                  sendLeadEmail();
-                  bubbleBot("Okay, vielen Dank 🐎. Unser Team wird sich innerhalb von 24 Stunden bei Ihnen melden. Brauchen Sie noch meine Hilfe bei etwas anderem😀?");
-                  row3.remove();
-                  addButtons([
-                    { label:"Ja. Zurück zum Hauptmenü.", onClick:renderHome, primary:true },
-                    { label:"Nein. Danke für deine Hilfe.", onClick:function(){ bubbleBot("Sehr gerne! Wenn Sie später Fragen haben, bin ich hier. 😊"); } }
-                  ]);
-                  return false;
-                }
+    /* ---- Koppelstatus-Flow (Minimal-Modus) ---- */
+    function viewPaddockStatus() {
+      showText('Mitgliederbereich: Gib dein Passwort ein, um den Koppelstatus zu sehen. (Nur für Stall-Mitglieder – kontaktiere den Besitzer bei Problemen.)', true);  // Input-Modus
+  
+      const input = document.querySelector('.bf-input, input[type="text"]');  // Passe Selector an
+      if (input) {
+        input.type = 'password';
+        input.placeholder = 'Mitglieder-Passwort eingeben';
+  
+        const handleEnter = async (e) => {
+          if (e.key === 'Enter') {
+            const password = input.value;
+            try {
+              const response = await fetch('/api/auth-member', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
               });
-              return false;
+              const data = await response.json();
+  
+              if (data.authenticated) {
+                // Auth OK: Status laden
+                const statusRes = await fetch('/api/paddock-status');
+                const status = await statusRes.json();
+                showText(`Koppelstatus: ${status.status === 'open' ? '🟢 Offen' : '🔴 Geschlossen'} (Letzte Änderung: ${new Date(status.updatedAt).toLocaleDateString('de-DE')}).`, false);
+  
+                addButtons([{ label: 'Logout & Home', onClick: () => { renderHome(); input.removeEventListener('keypress', handleEnter); } }]);
+              } else {
+                showText('❌ Falsches Passwort. Nur autorisierte Mitglieder haben Zugriff. Keine E-Mail-Option – kontaktiere den Stallbesitzer direkt.', false);
+                addButtons([{ label: 'Zurück', onClick: renderHome }]);
+              }
+            } catch (error) {
+              showText('Verbindungsfehler – versuche es später nochmal.', false);
+              addButtons([{ label: 'Zurück', onClick: renderHome }]);
             }
-          });
-          return false;
-        }
-      });
+            input.value = '';  // Clear
+          }
+        };
+        input.addEventListener('keypress', handleEnter);
+      } else {
+        showText('Fehler: Input-Feld nicht gefunden. Lade die Seite neu.', false);
+      }
     }
 
-    function sendLeadEmail(){
-      var ENDPOINT = CONFIG.API_BASE + '/api/send-lead';
-      var companyClean = (lead.company || '').toString().trim();
-      fetch(ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify({
-          name:     (lead.name     || ''),
-          email:    (lead.email    || ''),
-          features: (lead.features || ''),
-          company:  companyClean,
-          business: companyClean,
-          company_label: companyClean,
-          challenge:(lead.challenge|| '')
-        })
-      })
-      .then(function(r){ return r.text().then(function(t){ return{ok:r.ok,status:r.status,body:t}; }); })
-      .then(function(res){ console.log('Lead versendet:', res); })
-      .catch(function(err){ console.error('Fehler beim Versenden:', err); });
-    }
+    /* ---- Andere Views (deaktiviert im Minimal-Modus) ---- */
+    function viewFAQ(){ showText('FAQ: Kosten ab 350€. Mehr?'); addButtons([{label:'Home', onClick:renderHome}]); }
+    function viewOffer(){ showText('Angebot: Name/E-Mail eingeben.'); addButtons([{label:'Home', onClick:renderHome}]); }
+    function viewBooking(){ showText('Termin: Wähle Datum.'); addButtons([{label:'Home', onClick:renderHome}]); }
 
-    function viewFAQ(){
-      bubbleBot("Hier sind häufige Fragen zum Stall. Wählen Sie eine aus!");
-      var row=document.createElement("div");
-      row.className="bf-row bot";
-      row.innerHTML=
-        '<div class="bf-avatar">B</div>'+
-        '<div class="bf-bubble bot">'+
-          '<div>Worüber möchten Sie mehr erfahren? 🤔</div>'+
-          '<div class="bf-select-wrap">'+
-            '<select class="bf-select bf-faq">'+
-              '<option value="" disabled selected>Frage wählen…</option>'+
-              CONFIG.FAQ_OPTIONS.map(function(o,i){return '<option value="'+i+'">'+o.label+'</option>';}).join("")+
-            '</select>'+
-          '</div>'+
-        '</div>';
-      body.appendChild(row); scrollBottom();
-    }
+    /* ---- Über den Stall (deaktiviert) ---- */
+    function backButtons(){ addButtons([{ label:"Zurück zum Hauptmenü",onClick:renderHome }]); }
+    function viewAbout(){ showText('Über den Stall: Sichere Boxen und Pflege für Ihr Pferd.'); backButtons(); }
+    function viewAboutMenu(){ addButtons([{ label:"Unsere Boxen",onClick:backButtons }]); }
+    function showMission(){ showText('Unsere Boxen: Vollpension ab 450€.'); backButtons(); }
+    function showService(){ showText('Service: 24/7 Pflege.'); backButtons(); }
+    function showBenefits(){ showText('Vorteile: Grüne Koppeln.'); backButtons(); }
 
+    /* ============== Angebot / Lead-Erfassung (deaktiviert) ============== */
+    function viewOfferDisabled(){ showText('Angebot: Coming soon.'); addButtons([{label:'Home', onClick:renderHome}]); }
+    function leadIntro(){ showText('Lead: Coming soon.'); addButtons([{label:'Home', onClick:renderHome}]); }
+    function askForNameThenEmailAndFeatures(){ showText('Name: Coming soon.'); addButtons([{label:'Home', onClick:renderHome}]); }
+    function sendLeadEmail(){ console.log('Lead versendet (Demo).'); }
+    function showOtherCompanyChallenge(){ showText('Challenge: Coming soon.'); addButtons([{label:'Home', onClick:renderHome}]); }
+    function challengeIntroThenName(){ showText('Challenge: Coming soon.'); addButtons([{label:'Home', onClick:renderHome}]); }
+    function askCompanyFromFreeQuestion(){ showText('Company: Coming soon.'); addButtons([{label:'Home', onClick:renderHome}]); }
+
+    /* Badge */
     function showBadgeOnce(){
       if(!CONFIG.SHOW_BADGE_ON_LOAD) return;
       try{
@@ -625,11 +537,21 @@ Ihr InovaAgent-Agent`;
       if(e.key === "Escape" &&panel.classList.contains("open")) closePanel();
     });
 
-    /* kleine Utility für sichere Anzeige */
+    /* Utility */
     function escapeHtml(s){
       return String(s).replace(/[&<>"']/g,function(m){
         return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m];
       });
+    }
+
+    /* Minimal-Modus: Nur Koppelstatus */
+    function renderHome(){
+      clear();
+      bubbleBot(CONFIG.GREETING.replace(/\n/g,"<br>"));
+      addButtons([
+        { label:"Koppelstatus (Mitglieder)", onClick:viewPaddockStatus },
+        { label:"Schließen", onClick:closePanel }
+      ]);
     }
   })();
   </script>
