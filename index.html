@@ -1,229 +1,247 @@
-<!-- InovaAgent Chat Widget – kleinere Buttons, Shopify-stabil -->
-<script>
-(function(){
-  /* ---------------- CONFIG (pferde-spezifisch angepasst) ---------------- */
-  var CONFIG = {
-    BRAND: "Alex – Pferdepensionsstall Assistent",
-    SUBTITLE: "Ich helfe bei Stall-Fragen: Boxen, Termine, Koppelstatus & mehr. Lass uns starten!",
-    WIDGET_SIDE: "right",
-    BADGE_TEXT: "Neue Nachricht • Jetzt ansehen",
-    GREETING: "Hallo, ich bin Alex. Willkommen im Stall! 🐎\nFragen zu Boxen, Terminen oder Koppel? Ich helfe 24/7.\nProbier's aus!",
-    CALENDLY: "https://calendly.com/DEIN-STALL/30min",  // Deinen Calendly-Link hier
-    EMAIL: "info@dein-stall.de",  // Deine E-Mail
-    WHATSAPP: "https://wa.me/49170DEINNUMMER?text=Hi%2C%20ich%20habe%20eine%20Frage%20zum%20STALL.",
-    API_BASE: "https://api.bot-flow.net",  // Deine API (später für E-Mails)
-    SHOW_BADGE_ON_LOAD: true,
-    BADGE_SESSION_KEY: "bf_badge_shown",
-    z: 2147483000,
-    FAQ_OPTIONS: [
-      {
-        label: "Welche Boxentypen bieten Sie an?",
-        answer: 'Wir haben <strong>Vollpension</strong> (Futter & Pflege inkl., ab 450 €/Monat), <strong>Halbpension</strong> (Teilselbstversorger, ab 300 €) und <strong>Offenstall</strong> (Gruppenhaltung, ab 250 €). Alle Boxen sind wetterfest und sauber.<br><br>Kontaktieren Sie uns für Details!'
-      },
-      { label: "Wie funktioniert die Warteliste?", answer: "Bei ausgebuchten Boxen tragen wir Sie auf die Warteliste ein. Bei Freigabe melden wir uns per E-Mail oder WhatsApp – priorisiert nach Anmeldedatum." },
-      { label: "Ist der Stall DSGVO-konform?", answer: "Ja, alle Daten (z. B. für Termine/Leads) werden EU-weit gesichert und nur mit Einwilligung verarbeitet. Keine Weitergabe an Dritte." },
-      { label: "Kann ich eine Besichtigung buchen?", answer: "Gerne! Wählen Sie einen Termin – ich leite Sie zu Calendly weiter. Alternativ: Rufen Sie an." },
-      { label: "Was kostet eine Koppelbuchung?", answer: "Koppelzugriff für Mitglieder: 50 €/Monat (inkl. Status-Updates). Für Gäste: 10 €/Tag." },
-      { label: "Wie lange dauert die Einrichtung?", answer: "In der Regel <strong>3–5 Werktage</strong> nach Bereitstellung Ihrer Inhalte. Bei komplexeren Projekten kann es etwas länger dauern." },
-      { label: "Welche Vorteile hat der Bot?", answer: "Der Bot beantwortet Fragen 24/7, sammelt Leads und bucht Termine – <strong>automatisch und DSGVO-konform</strong>." },
-      { label: "Für welche Ställe ist der Bot sinnvoll?", answer: "Besonders für <strong>Pferdepensionsställe, Reitställe und Tierkliniken</strong>. Alle mit vielen Anfragen profitieren." },
-      { label: "Ist der Bot DSGVO-konform?", answer: "Ja, der Bot ist <strong>DSGVO-konform</strong>.<br>Ihre Daten werden nicht dauerhaft gespeichert, sondern nur zur Weiterleitung genutzt." },
-      { label: "Kann das Design angepasst werden?", answer: "Ja. <strong>Farben, Logo, Schriftarten und Texte</strong> werden auf Ihren Stall abgestimmt." },
-      { label: "Muss ich technische Kenntnisse haben?", answer: "Nein. <strong>Wir übernehmen Einrichtung, Anpassung und Wartung</strong> – Sie konzentrieren sich auf Ihren Stall." },
-      { label: "Gibt es eine Vertragslaufzeit?", answer: "Ja. Wir arbeiten mit einer <strong>Mindestlaufzeit von 6 Monaten</strong>. Danach können Sie jederzeit kündigen." },
-      { label: "Wer hilft bei Problemen?", answer: "Unser <strong>Support</strong> steht per E-Mail oder Telefon zur Verfügung. <strong>Updates und Optimierungen</strong> sind inklusive." },
-      { label: "Kann ich den Bot später erweitern?", answer: "Ja. Sie können jederzeit neue <strong>Fragen, Funktionen oder Integrationen</strong> hinzufügen – wir kümmern uns." }
-    ],
-    /* Zieladresse für die Buchungs-Mail */
-    BOOKING_NOTIFY_EMAIL: "info@dein-stall.de"  // Deine E-Mail für Termine
-  };
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alex – Pferdepensionsstall Assistent</title>
+</head>
+<body>
+  <h1>Willkommen im Stall</h1>
+  <p>Klick unten rechts für den Bot-Assistenten!</p>
 
-  /* ---------------- STYLES ---------------- */
-  var s = document.createElement("style");
-  s.type = "text/css";
-  s.textContent = 'html,body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;-webkit-text-size-adjust:100%}' +
-    '.bf-reset,.bf-reset *{box-sizing:border-box;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:geometricPrecision}' +
-    ':root{--c-bg:#0b0f14;--c-panel:#10151c;--c-header:#0e131a;--c-border:#232a34;--c-muted:#8b95a7;--c-text:#e8edf5;--c-bubble:#1b2230;--c-bubble-2:#202838;--c-user:#4a86ff;--shadow:0 20px 40px rgba(0,0,0,.45),0 6px 16px rgba(0,0,0,.35)}' +
-    '.bf-widget{position:fixed;bottom:16px;right:16px;z-index:'+CONFIG.z+'}' +
-    /* FAB – hellblaues Icon wie im Screenshot */
-    '.bf-fab{width:56px;height:56px;border-radius:999px;border:none;background:#b7dbff;color:#0f1b24;display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow);position:relative;transition:transform .08s ease, background .2s ease}' +
-    '.bf-fab:hover{background:#a8d2ff}' +
-    '.bf-fab:active{transform:scale(.98)}' +
-    '.bf-fab svg{width:26px;height:26px;display:block}' +
-    /* Info-Dot ausgeblendet */
-    '.bf-dot{display:none}' +
-    /* >>> überarbeitete Ein-Zeilen-Mitteilung mit Pfeil <<< */
-    '.bf-badge{position:absolute;bottom:76px;right:-6px;background:#b7dbff;color:#0f1b24;border:none;border-radius:12px;padding:8px 12px;font-size:14px;line-height:1;font-weight:600;box-shadow:var(--shadow);white-space:nowrap;display:none}.bf-badge.show{display:block}' +
-    '.bf-badge::after{content:"";position:absolute;right:16px;bottom:-6px;width:12px;height:12px;background:#b7dbff;transform:rotate(45deg);border-bottom-right-radius:2px}' +
-    '.bf-panel{position:fixed;bottom:84px;right:16px;width:380px;max-width:calc(100vw - 32px);background:var(--c-panel);border:1px solid var(--c-border);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);display:none}.bf-panel.open{display:block}' +
-    /* Header + einklappbarer Untertitel */
-    '.bf-header{background:var(--c-header);color:var(--c-text);padding:12px 14px;border-bottom:1px solid var(--c-border);display:flex;gap:10px;align-items:center;justify-content:space-between;user-select:none}' +
-    '.bf-header.bf-click{cursor:pointer}' +
-    '.bf-head{display:flex;gap:10px;align-items:center;min-width:0}.bf-avatar{width:30px;height:30px;border-radius:999px;background:#1f2937;display:grid;place-items:center;font-weight:700;font-size:14px;color:#fff}' +
-    '.bf-title{font-weight:700;font-size:15px;color:var(--c-text)}' +
-    '.bf-sub{font-size:12px;color:var(--c-muted);max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:max-height .2s ease,opacity .2s ease,white-space .2s ease}' +
-    '.bf-header.bf-expanded .bf-sub{max-height:200px;opacity:1;white-space:normal;overflow:visible;text-overflow:unset;max-width:100%}' +
-    '.bf-actions{display:flex;gap:8px}' +
-    '.bf-body{background:var(--c-bg);color:var(--c-text);max-height:64vh;overflow:auto;padding:12px;scroll-behavior:smooth}' +
-    '.bf-divider{margin:8px auto 14px;width:max-content;background:#121820;border:1px solid var(--c-border);color:var(--c-muted);font-size:12px;border-radius:999px;padding:4px 10px}'+
-    '.bf-row{display:flex;gap:8px;margin-bottom:10px;align-items:flex-end}.bf-row.bot{justify-content:flex-start}.bf-row.user{justify-content:flex-end}' +
-    '.bf-bubble{background:var(--c-bubble);border:1px solid var(--c-border);padding:12px 14px;border-radius:16px;max-width:86%;line-height:1.55;font-size:15px;color:var(--c-text)}' +
-    '.bf-bubble.bot{background:var(--c-bubble-2)}.bf-bubble.user{background:#4a86ff;color:#fff}' +
-    /* kleinere Buttons */
-    '.bf-buttons{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}.bf-buttons .bf-btn.chosen{margin-top:16px}' +
-    /* === EINHEITLICHE BUTTON-FARBE + HOVER === */
-    '.bf-btn{border:1px solid #2d3a52;background:#26334b;color:#cfe0ff;padding:6px 10px;border-radius:999px;font-size:13px;cursor:pointer;line-height:1.2;transition:background .2s ease,border-color .2s ease}' +
-    '.bf-btn:hover{background:#314260;border-color:#3b4f6f}' +
-    '.bf-btn.primary{background:#26334b;border-color:#2d3a52;color:#cfe0ff;font-weight:600}' +
-    '.bf-btn.primary:hover{background:#314260;border-color:#3b4f6f}' +
-    /* Header-Buttons (Refresh/Close) noch etwas kompakter */
-    '.bf-actions .bf-btn{padding:4px 8px;font-size:12px;background:#26334b;border-color:#2d3a52;color:#cfe0ff}' +
-    '.bf-actions .bf-btn:hover{background:#314260;border-color:#3b4f6f}' +
-    /* kleinerer CTA unten */
-    '.bf-footer{border-top:1px solid var(--c-border);background:#0e131a;padding:10px;display:flex;gap:8px}' +
-    '.bf-cta{flex:1;height:38px;border-radius:10px;border:none;background:#26334b;color:#cfe0ff;font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.25);transition:background .2s ease}'+
-    '.bf-cta:hover{background:#314260}' +
-    /* Select (FAQ) */
-    '.bf-select-wrap{position:relative;margin-top:10px}' +
-    '.bf-select{-webkit-appearance:none;-moz-appearance:none;appearance:none;background:#0f141b;border:1px solid var(--c-border);color:#0bd;border-radius:12px;height:46px;width:100%;padding:0 42px 0 14px;font-size:15px;line-height:46px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);background-image:none;-webkit-tap-highlight-color:transparent;color-scheme:dark}' +
-    '.bf-select:focus{outline:none;border-color:#4a86ff;box-shadow:0 0 0 3px rgba(74,134,255,.35)}' +
-    '.bf-select-wrap:after{content:"▾";position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:#9aa3b2;font-size:16px}' +
-    /* >>> Inputzeile + klickbarer Enter-Button <<< */
-    '.bf-inputrow{margin-top:10px;display:flex;gap:8px;align-items:center;position:relative}'+
-    '.bf-input{flex:1;background:#0f141b;border:1px solid var(--c-border);color:var(--c-text);padding:10px 42px 10px 12px;border-radius:12px;font-size:15px;line-height:1.2}'+
-    '.bf-input:focus{outline:none;border-color:#4a86ff;box-shadow:0 0 0 3px rgba(74,134,255,.25)}'+
-    '.bf-inputsend{position:absolute;right:6px;top:50%;transform:translateY(-50%);height:30px;min-width:30px;padding:0 8px;border-radius:8px;border:1px solid var(--c-border);background:#26334b;color:#cfe0ff;font-size:14px;cursor:pointer;display:grid;place-items:center}'+
-    '.bf-inputsend:hover{background:#314260;border-color:#3b4f6f}'+
-    '.bf-inputsend:disabled{opacity:.55;cursor:not-allowed}'+
-    '@media(max-width:480px){.bf-panel{width:calc(100vw - 32px)}}';
-  document.head.appendChild(s);
+  <!-- InovaAgent Chat Widget – kleinere Buttons, Shopify-stabil (fehlerfrei) -->
+  <script>
+  (function(){
+    /* ---------------- CONFIG (pferde-spezifisch angepasst) ---------------- */
+    var CONFIG = {
+      BRAND: "Alex – Pferdepensionsstall Assistent",
+      SUBTITLE: "Ich helfe bei Stall-Fragen: Boxen, Termine, Koppelstatus & mehr. Lass uns starten!",
+      WIDGET_SIDE: "right",
+      BADGE_TEXT: "Neue Nachricht • Jetzt ansehen",
+      GREETING: "Hallo, ich bin Alex. Willkommen im Stall! 🐎\nFragen zu Boxen, Terminen oder Koppel? Ich helfe 24/7.\nProbier's aus!",
+      CALENDLY: "https://calendly.com/DEIN-STALL/30min",
+      EMAIL: "info@dein-stall.de",
+      WHATSAPP: "https://wa.me/4917099999999?text=Hi%2C%20ich%20m%C3%B6chte%20eine%20Demo%20eures%20Chatbots.",
+      API_BASE: "https://api.bot-flow.net",
+      SHOW_BADGE_ON_LOAD: true,
+      BADGE_SESSION_KEY: "bf_badge_shown",
+      z: 2147483000,
+      FAQ_OPTIONS: [
+        {
+          label: "Welche Boxentypen bieten Sie an?",
+          answer: 'Die einmalige Einrichtung inkl. individueller Anpassung, Design, Integration und Testphase kostet <strong>350,00–450,00&nbsp;€</strong> (abhängig vom Funktionsumfang).<br>' +
+                  'Dazu kommt eine <strong>monatliche Service- und Betriebspauschale von 400,00&nbsp;€</strong>.<br><br>' +
+                  'Diese Pauschale deckt alle laufenden Leistungen ab:' +
+                  '<ul style="margin:8px 0 0 18px">' +
+                  '<li>Betrieb & Hosting des virtuellen Agenten</li>' +
+                  '<li>DSGVO-konforme Datenverarbeitung & Sicherheitsupdates</li>' +
+                  '<li>Überwachung & Fehlerbehebung</li>' +
+                  '<li>Laufende Optimierung bei Bedarf</li>' +
+                  '<li>Monatliches Performance-Monitoring</li>' +
+                  '<li>Bereitstellung ausführlicher Monatsberichte</li>' +
+                  '<li>Persönlicher Support</li>' +
+                  '</ul>'
+        },
+        { label: "Wie lange dauert die Einrichtung?", answer: "In der Regel <strong>3–5 Werktage</strong> nach Bereitstellung Ihrer Inhalte. Bei komplexeren Projekten kann es etwas länger dauern." },
+        { label: "Welche Vorteile hat der virtuelle Agent?", answer: "Ihr virtueller Agent beantwortet häufig gestellte Fragen, sammelt Kontaktdaten, empfiehlt Produkte oder Dienstleistungen und leitet qualifizierte Leads direkt an Sie weiter – <strong>automatisch, 24/7 und DSGVO-konform</strong>." },
+        { label: "Für welche Unternehmen ist ein virtueller Agent sinnvoll?", answer: "Besonders für <strong>Hausverwaltungen, Autohäuser und Hotels</strong>. Grundsätzlich profitieren jedoch alle Unternehmen mit vielen Kundenanfragen oder Terminbuchungen, z.&nbsp;B. <strong>Arztpraxen, Dienstleister oder Online-Shops</strong>." },
+        { label: "Ist der virtuelle Agent DSGVO-konform?", answer: "Ja, der virtuelle Agent ist <strong>DSGVO-konform</strong>.<br>Ihre Daten werden nicht dauerhaft gespeichert, sondern ausschließlich zur Weiterleitung genutzt. Die Verarbeitung erfolgt nach den geltenden Datenschutzbestimmungen." },
+        { label: "Kann das Design angepasst werden?", answer: "Ja. <strong>Farben, Logo, Schriftarten und Texte</strong> werden komplett auf Ihre Marke abgestimmt, damit der Chatbot wie ein Teil Ihrer Website wirkt." },
+        { label: "Muss ich dafür technische Kenntnisse haben?", answer: "Nein. <strong>Wir übernehmen Einrichtung, Anpassung, Wartung und Optimierung</strong> – Sie konzentrieren sich auf Ihr Geschäft." },
+        { label: "Gibt es eine Vertragslaufzeit?", answer: "Ja. Wir arbeiten mit einer <strong>Mindestlaufzeit von 6 Monaten</strong>. Danach können Sie jederzeit kündigen." },
+        { label: "Wer hilft mir, wenn es Probleme gibt?", answer: "Unser <strong>Support</strong> steht Ihnen jederzeit per E-Mail oder Telefon zur Verfügung. <strong>Updates und Optimierungen</strong> sind inklusive." },
+        { label: "Kann ich den virtuellen Agenten später erweitern?", answer: "Ja. Sie können jederzeit neue <strong>Fragen, Funktionen oder Integrationen</strong> hinzufügen – wir kümmern uns um die Umsetzung." }
+      ],
+      /* Zieladresse für die Buchungs-Mail */
+      BOOKING_NOTIFY_EMAIL: "contact@bot-flow.net"
+    };
 
-  /* ---------------- DOM ---------------- */
-  var shell = document.createElement("div");
-  shell.className = "bf-reset bf-widget";
-  shell.innerHTML = '<button class="bf-fab" id="bf-open" aria-label="Chat öffnen" title="Chat öffnen">'+
-    '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-7.4l-3.7 2.8a1 1 0 0 1-1.6-.8V17H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>'+
-    '<span class="bf-dot" id="bf-dot"></span>'+
-  '</button>' +
-  '<div class="bf-badge" id="bf-badge">👋 Ich helfe Ihnen bei Ihrem Anliegen</div>' +
-  '<section class="bf-panel" id="bf-panel" role="dialog" aria-modal="true">' +
-    '<div class="bf-header bf-click" id="bf-header" aria-expanded="false">' +
-      '<div class="bf-head"><div class="bf-avatar">B</div><div><div class="bf-title">'+CONFIG.BRAND+'</div><div class="bf-sub" id="bf-sub">'+CONFIG.SUBTITLE+'</div></div></div>' +
-      '<div class="bf-actions">' +
-        '<button class="bf-btn" id="bf-refresh" title="Neu starten" style="border-radius:10px;background:#1b2330;border-color:#2a3446;color:#cbd5e1">⟲</button>' +
-        '<button class="bf-btn" id="bf-close" title="Schließen" style="border-radius:10px;background:#1b2330;border-color:#2a3446;color:#cbd5e1">✕</button>' +
+    /* ---------------- STYLES ---------------- */
+    var s = document.createElement("style");
+    s.type = "text/css";
+    s.textContent = 'html,body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;-webkit-text-size-adjust:100%}' +
+      '.bf-reset,.bf-reset *{box-sizing:border-box;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:geometricPrecision}' +
+      ':root{--c-bg:#0b0f14;--c-panel:#10151c;--c-header:#0e131a;--c-border:#232a34;--c-muted:#8b95a7;--c-text:#e8edf5;--c-bubble:#1b2230;--c-bubble-2:#202838;--c-user:#4a86ff;--shadow:0 20px 40px rgba(0,0,0,.45),0 6px 16px rgba(0,0,0,.35)}' +
+      '.bf-widget{position:fixed;bottom:16px;right:16px;z-index:'+CONFIG.z+'}' +
+      /* FAB – hellblaues Icon wie im Screenshot */
+      '.bf-fab{width:56px;height:56px;border-radius:999px;border:none;background:#b7dbff;color:#0f1b24;display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow);position:relative;transition:transform .08s ease, background .2s ease}' +
+      '.bf-fab:hover{background:#a8d2ff}' +
+      '.bf-fab:active{transform:scale(.98)}' +
+      '.bf-fab svg{width:26px;height:26px;display:block}' +
+      /* Info-Dot ausgeblendet */
+      '.bf-dot{display:none}' +
+      /* >>> überarbeitete Ein-Zeilen-Mitteilung mit Pfeil <<< */
+      '.bf-badge{position:absolute;bottom:76px;right:-6px;background:#b7dbff;color:#0f1b24;border:none;border-radius:12px;padding:8px 12px;font-size:14px;line-height:1;font-weight:600;box-shadow:var(--shadow);white-space:nowrap;display:none}.bf-badge.show{display:block}' +
+      '.bf-badge::after{content:"";position:absolute;right:16px;bottom:-6px;width:12px;height:12px;background:#b7dbff;transform:rotate(45deg);border-bottom-right-radius:2px}' +
+      '.bf-panel{position:fixed;bottom:84px;right:16px;width:380px;max-width:calc(100vw - 32px);background:var(--c-panel);border:1px solid var(--c-border);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);display:none}.bf-panel.open{display:block}' +
+      /* Header + einklappbarer Untertitel */
+      '.bf-header{background:var(--c-header);color:var(--c-text);padding:12px 14px;border-bottom:1px solid var(--c-border);display:flex;gap:10px;align-items:center;justify-content:space-between;user-select:none}' +
+      '.bf-header.bf-click{cursor:pointer}' +
+      '.bf-head{display:flex;gap:10px;align-items:center;min-width:0}.bf-avatar{width:30px;height:30px;border-radius:999px;background:#1f2937;display:grid;place-items:center;font-weight:700;font-size:14px;color:#fff}' +
+      '.bf-title{font-weight:700;font-size:15px;color:var(--c-text)}' +
+      '.bf-sub{font-size:12px;color:var(--c-muted);max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:max-height .2s ease,opacity .2s ease,white-space .2s ease}' +
+      '.bf-header.bf-expanded .bf-sub{max-height:200px;opacity:1;white-space:normal;overflow:visible;text-overflow:unset;max-width:100%}' +
+      '.bf-actions{display:flex;gap:8px}' +
+      '.bf-body{background:var(--c-bg);color:var(--c-text);max-height:64vh;overflow:auto;padding:12px;scroll-behavior:smooth}' +
+      '.bf-divider{margin:8px auto 14px;width:max-content;background:#121820;border:1px solid var(--c-border);color:var(--c-muted);font-size:12px;border-radius:999px;padding:4px 10px}'+
+      '.bf-row{display:flex;gap:8px;margin-bottom:10px;align-items:flex-end}.bf-row.bot{justify-content:flex-start}.bf-row.user{justify-content:flex-end}' +
+      '.bf-bubble{background:var(--c-bubble);border:1px solid var(--c-border);padding:12px 14px;border-radius:16px;max-width:86%;line-height:1.55;font-size:15px;color:var(--c-text)}' +
+      '.bf-bubble.bot{background:var(--c-bubble-2)}.bf-bubble.user{background:#4a86ff;color:#fff}' +
+      /* kleinere Buttons */
+      '.bf-buttons{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}.bf-buttons .bf-btn.chosen{margin-top:16px}' +
+      /* === EINHEITLICHE BUTTON-FARBE + HOVER === */
+      '.bf-btn{border:1px solid #2d3a52;background:#26334b;color:#cfe0ff;padding:6px 10px;border-radius:999px;font-size:13px;cursor:pointer;line-height:1.2;transition:background .2s ease,border-color .2s ease}' +
+      '.bf-btn:hover{background:#314260;border-color:#3b4f6f}' +
+      '.bf-btn.primary{background:#26334b;border-color:#2d3a52;color:#cfe0ff;font-weight:600}' +
+      '.bf-btn.primary:hover{background:#314260;border-color:#3b4f6f}' +
+      /* Header-Buttons (Refresh/Close) noch etwas kompakter */
+      '.bf-actions .bf-btn{padding:4px 8px;font-size:12px;background:#26334b;border-color:#2d3a52;color:#cfe0ff}' +
+      '.bf-actions .bf-btn:hover{background:#314260;border-color:#3b4f6f}' +
+      /* kleinerer CTA unten */
+      '.bf-footer{border-top:1px solid var(--c-border);background:#0e131a;padding:10px;display:flex;gap:8px}' +
+      '.bf-cta{flex:1;height:38px;border-radius:10px;border:none;background:#26334b;color:#cfe0ff;font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.25);transition:background .2s ease}'+
+      '.bf-cta:hover{background:#314260}' +
+      /* Select (FAQ) */
+      '.bf-select-wrap{position:relative;margin-top:10px}' +
+      '.bf-select{-webkit-appearance:none;-moz-appearance:none;appearance:none;background:#0f141b;border:1px solid var(--c-border);color:#0bd;border-radius:12px;height:46px;width:100%;padding:0 42px 0 14px;font-size:15px;line-height:46px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);background-image:none;-webkit-tap-highlight-color:transparent;color-scheme:dark}' +
+      '.bf-select:focus{outline:none;border-color:#4a86ff;box-shadow:0 0 0 3px rgba(74,134,255,.35)}' +
+      '.bf-select-wrap:after{content:"▾";position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:#9aa3b2;font-size:16px}' +
+      /* >>> Inputzeile + klickbarer Enter-Button <<< */
+      '.bf-inputrow{margin-top:10px;display:flex;gap:8px;align-items:center;position:relative}'+
+      '.bf-input{flex:1;background:#0f141b;border:1px solid var(--c-border);color:var(--c-text);padding:10px 42px 10px 12px;border-radius:12px;font-size:15px;line-height:1.2}'+
+      '.bf-input:focus{outline:none;border-color:#4a86ff;box-shadow:0 0 0 3px rgba(74,134,255,.25)}'+
+      '.bf-inputsend{position:absolute;right:6px;top:50%;transform:translateY(-50%);height:30px;min-width:30px;padding:0 8px;border-radius:8px;border:1px solid var(--c-border);background:#26334b;color:#cfe0ff;font-size:14px;cursor:pointer;display:grid;place-items:center}'+
+      '.bf-inputsend:hover{background:#314260;border-color:#3b4f6f}'+
+      '.bf-inputsend:disabled{opacity:.55;cursor:not-allowed}'+
+      '@media(max-width:480px){.bf-panel{width:calc(100vw - 32px)}}';
+    document.head.appendChild(s);
+
+    /* ---------------- DOM ---------------- */
+    var shell = document.createElement("div");
+    shell.className = "bf-reset bf-widget";
+    shell.innerHTML = '<button class="bf-fab" id="bf-open" aria-label="Chat öffnen" title="Chat öffnen">'+
+      '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-7.4l-3.7 2.8a1 1 0 0 1-1.6-.8V17H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>'+
+      '<span class="bf-dot" id="bf-dot"></span>'+
+    '</button>' +
+    '<div class="bf-badge" id="bf-badge">👋 Ich helfe Ihnen bei Ihrem Anliegen</div>' +
+    '<section class="bf-panel" id="bf-panel" role="dialog" aria-modal="true">' +
+      '<div class="bf-header bf-click" id="bf-header" aria-expanded="false">' +
+        '<div class="bf-head"><div class="bf-avatar">B</div><div><div class="bf-title">'+CONFIG.BRAND+'</div><div class="bf-sub" id="bf-sub">'+CONFIG.SUBTITLE+'</div></div></div>' +
+        '<div class="bf-actions">' +
+          '<button class="bf-btn" id="bf-refresh" title="Neu starten" style="border-radius:10px;background:#1b2330;border-color:#2a3446;color:#cbd5e1">⟲</button>' +
+          '<button class="bf-btn" id="bf-close" title="Schließen" style="border-radius:10px;background:#1b2330;border-color:#2a3446;color:#cbd5e1">✕</button>' +
+        '</div>' +
       '</div>' +
-    '</div>' +
-    '<div class="bf-body" id="bf-body" tabindex="-1" aria-live="polite"></div>' +
-    '<div class="bf-footer"><button class="bf-cta" id="bf-cta">📅 Termin buchen</button></div>' +
-  '</section>';
-  document.body.appendChild(shell);
+      '<div class="bf-body" id="bf-body" tabindex="-1" aria-live="polite"></div>' +
+      '<div class="bf-footer"><button class="bf-cta" id="bf-cta">📅 Termin buchen</button></div>' +
+    '</section>';
+    document.body.appendChild(shell);
 
-  /* ---------------- STATE (Persistenz) ---------------- */
-  var CB = [];
-  var STORAGE_KEY = "bf_chat_session_html";
+    /* ---------------- STATE (Persistenz) ---------------- */
+    var CB = [];
+    var STORAGE_KEY = "bf_chat_session_html";
 
-  /* --------- Lead-Daten --------- */
-  var lead = { company:null, name:null,email:null, features:null, challenge:null };
-  /* --------- Termin-Buchung Kontakt --------- */
-  var booking = { name:"", concern:"", phone:""};
+    /* --------- Lead-Daten --------- */
+    var lead = { company:null, name:null,email:null, features:null, challenge:null };
+    /* --------- Termin-Buchung Kontakt --------- */
+    var booking = { name:"", concern:"", phone:""};
 
-  /* ---------------- HELPERS ---------------- */
-  function $(q,e){ return(e||document).querySelector(q); }
-  var panel=$("#bf-panel"), body=$("#bf-body"),openB=$("#bf-open"), badge=$("#bf-badge"),dot=$("#bf-dot"), cta=$("#bf-cta");
-  var header=$("#bf-header");
+    /* ---------------- HELPERS ---------------- */
+    function $(q,e){ return(e||document).querySelector(q); }
+    var panel=$("#bf-panel"), body=$("#bf-body"),openB=$("#bf-open"), badge=$("#bf-badge"),dot=$("#bf-dot"), cta=$("#bf-cta");
+    var header=$("#bf-header");
 
-  function saveSession(){ try{sessionStorage.setItem(STORAGE_KEY,body.innerHTML); }catch(e){} }
-  function loadSession(){
-    var html=null; try{html=sessionStorage.getItem(STORAGE_KEY); }catch(e){}
-    if(html){ body.innerHTML = html;rebindInteractive(); return true; }
-    return false;
-  }
-  function clearSession(){ try{sessionStorage.removeItem(STORAGE_KEY); }catch(e){} }
-
-  function openPanel(){panel.classList.add("open");badge.classList.remove("show"); if(dot)dot.style.display="none"; if(!loadSession()){renderHome(); } }
-  function closePanel(){ saveSession();panel.classList.remove("open"); }
-  $("#bf-close").onclick = closePanel;
-  openB.onclick = openPanel;
-
-  /* === Header: auf/zu klappen beim Klicken auf die Leiste (außer Buttons) === */
-  if (header){
-    header.addEventListener('click', function(e){
-      var actions = header.querySelector('.bf-actions');
-      if (actions && actions.contains(e.target))return; // Klicks auf Buttons ignorieren
-      header.classList.toggle('bf-expanded');
-      header.setAttribute('aria-expanded',header.classList.contains('bf-expanded') ? 'true' : 'false');
-    });
-  }
-
-  /* === CTA: zuerst Kontaktdaten (Name → Anliegen → Telefon), dann Slot-Vorschlag === */
-  cta.onclick = function(){
-    booking = { name:"", concern:"", phone:"" };
-    bubbleBot("Gerne! Damit ich einen Termin für Sie vormerken kann, bräuchte ich kurz Ihre Kontaktdaten. Wie ist Ihr <strong>Name</strong>?");
-    askBookingName();
-  };
-
-  function askBookingName(){
-    showTextInput({
-      placeholder:"Vor- und Nachname…",
-      onSubmit:function(val){
-        booking.name = val;
-        bubbleBot("Danke, "+escapeHtml(val)+"! Worum geht es Ihnen? Beschreiben Sie Ihr <strong>Anliegen</strong> in ein bis zwei Sätzen.");
-        askBookingConcern();
-        return false;
-      }
-    });
-  }
-
-  function askBookingConcern(){
-    showTextInput({
-      placeholder:"Ihr Anliegen…",
-      onSubmit:function(val){
-        booking.concern = val;
-        bubbleBot("Perfekt. Wie erreichen wir Sie telefonisch? Bitte geben Sie Ihre <strong>Telefonnummer</strong> an.");
-        askBookingPhone();
-        return false;
-      }
-    });
-  }
-
-  function askBookingPhone(){
-    showTextInput({
-      placeholder:"Telefonnummer…",
-      onSubmit: async function(val){
-        booking.phone = val;
-        bubbleBot("Vielen Dank! Ich suche jetzt direkt den nächsten freien Termin…");
-        await suggestAndConfirmWithDetails();
-        return false;
-      }
-    });
-  }
-
-  /* ---------- Datums-Formatter ---------- */
-  function formatDateTimeDE(value){
-    if (value == null) return "unbekannt";
-    var d = null;
-    if (typeof value === "number") {
-      d = new Date(value);
-    } else if (typeof value === "string") {
-      d = new Date(value);
-      if (isNaN(d) && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value) && !/[zZ]|[+\-]\d{2}:\d{2}$/.test(value)) {
-        d = new Date(value + "Z");
-      }
-    } else if (typeof value === "object") {
-      if (value.dateTime) d = newDate(value.dateTime);
-      else if (value.start && value.start.dateTime) d = newDate(value.start.dateTime);
+    function saveSession(){ try{sessionStorage.setItem(STORAGE_KEY,body.innerHTML); }catch(e){} }
+    function loadSession(){
+      var html=null; try{html=sessionStorage.getItem(STORAGE_KEY); }catch(e){}
+      if(html){ body.innerHTML = html;rebindInteractive(); return true; }
+      return false;
     }
-    if (!d || isNaN(d)) return "unbekannt";
-    return d.toLocaleString('de-DE', { dateStyle: 'full', timeStyle: 'short' });
-  }
+    function clearSession(){ try{sessionStorage.removeItem(STORAGE_KEY); }catch(e){} }
 
-  /* ---------- SEPARATE Buchungs-Mail ---------- */
-  function sendBookingEmailViaSameAPI(startLike){
-    var label = formatDateTimeDE(startLike);
-    var subj  = "Neuer Termin von " + (booking.name || "Neuer Kontakt");
+    function openPanel(){panel.classList.add("open");badge.classList.remove("show"); if(dot)dot.style.display="none"; if(!loadSession()){renderHome(); } }
+    function closePanel(){ saveSession();panel.classList.remove("open"); }
+    $("#bf-close").onclick = closePanel;
+    openB.onclick = openPanel;
 
-    var bookingText = `Hallo Team von InovaAgent,
+    /* === Header: auf/zu klappen beim Klicken auf die Leiste (außer Buttons) === */
+    if (header){
+      header.addEventListener('click', function(e){
+        var actions = header.querySelector('.bf-actions');
+        if (actions && actions.contains(e.target))return; // Klicks auf Buttons ignorieren
+        header.classList.toggle('bf-expanded');
+        header.setAttribute('aria-expanded',header.classList.contains('bf-expanded') ? 'true' : 'false');
+      });
+    }
+
+    /* === CTA: zuerst Kontaktdaten (Name → Anliegen → Telefon), dann Slot-Vorschlag === */
+    cta.onclick = function(){
+      booking = { name:"", concern:"", phone:"" };
+      bubbleBot("Gerne! Damit ich einen Termin für Sie vormerken kann, bräuchte ich kurz Ihre Kontaktdaten. Wie ist Ihr <strong>Name</strong>?");
+      askBookingName();
+    };
+
+    function askBookingName(){
+      showTextInput({
+        placeholder:"Vor- und Nachname…",
+        onSubmit:function(val){
+          booking.name = val;
+          bubbleBot("Danke, "+escapeHtml(val)+"! Worum geht es Ihnen? Beschreiben Sie Ihr <strong>Anliegen</strong> in ein bis zwei Sätzen.");
+          askBookingConcern();
+          return false;
+        }
+      });
+    }
+
+    function askBookingConcern(){
+      showTextInput({
+        placeholder:"Ihr Anliegen…",
+        onSubmit:function(val){
+          booking.concern = val;
+          bubbleBot("Perfekt. Wie erreichen wir Sie telefonisch? Bitte geben Sie Ihre <strong>Telefonnummer</strong> an.");
+          askBookingPhone();
+          return false;
+        }
+      });
+    }
+
+    function askBookingPhone(){
+      showTextInput({
+        placeholder:"Telefonnummer…",
+        onSubmit: async function(val){
+          booking.phone = val;
+          bubbleBot("Vielen Dank! Ich suche jetzt direkt den nächsten freien Termin…");
+          await suggestAndConfirmWithDetails();
+          return false;
+        }
+      });
+    }
+
+    /* ---------- Datums-Formatter ---------- */
+    function formatDateTimeDE(value){
+      if (value == null) return "unbekannt";
+      var d = null;
+      if (typeof value === "number") {
+        d = new Date(value);
+      } else if (typeof value === "string") {
+        d = new Date(value);
+        if (isNaN(d) && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value) && !/[zZ]|[+\-]\d{2}:\d{2}$/.test(value)) {
+          d = new Date(value + "Z");
+        }
+      } else if (typeof value === "object") {
+        if (value.dateTime) d = new Date(value.dateTime);
+        else if (value.start && value.start.dateTime) d = new Date(value.start.dateTime);
+      }
+      if (!d || isNaN(d)) return "unbekannt";
+      return d.toLocaleString('de-DE', { dateStyle: 'full', timeStyle: 'short' });
+    }
+
+    /* ---------- SEPARATE Buchungs-Mail ---------- */
+    function sendBookingEmailViaSameAPI(startLike){
+      var label = formatDateTimeDE(startLike);
+      var subj  = "Neuer Termin von " + (booking.name || "Neuer Kontakt");
+
+      var bookingText = `Hallo Team von InovaAgent,
 
 der Chatbot hat einen Termin am ${label} in Ihrem Kalender eingetragen.
 
@@ -235,383 +253,385 @@ Tel. Nr.: ${booking.phone || '-'}
 Mit freundlichen Grüßen
 Ihr InovaAgent-Agent`;
 
-    fetch(CONFIG.API_BASE + "/api/send-lead?template=booking", {
-      method: "POST",
-      headers: { "Content-Type":"application/json" },
-      body: JSON.stringify({
-        template: "booking",
-        subject: subj,
-        to: CONFIG.BOOKING_NOTIFY_EMAIL,
-        text: bookingText,
-        name: booking.name || "",
-        concern: booking.concern || "",
-        phone: booking.phone || "",
-        start: startLike || null,
-        meta: { type: "booking", sourceUrl:location.href }
+      fetch(CONFIG.API_BASE + "/api/send-lead?template=booking", {
+        method: "POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify({
+          template: "booking",
+          subject: subj,
+          to: CONFIG.BOOKING_NOTIFY_EMAIL,
+          text: bookingText,
+          name: booking.name || "",
+          concern: booking.concern || "",
+          phone: booking.phone || "",
+          start: startLike || null,
+          meta: { type: "booking", sourceUrl:location.href }
+        })
       })
-    })
-    .then(function(r){ return r.text().then(function(t){ return{ok:r.ok,status:r.status,body:t}; }); })
-    .then(function(res){ console.log("[Booking-Mail] Response:", res); })
-    .catch(function(err){ console.error("[Booking-Mail] Fehler:", err); });
-  }
-
-  /* ---------- Startzeit extrahieren ---------- */
-  function extractStartISO(suggestResponse,confirmResponse){
-    var s = suggestResponse || {};
-    var c = confirmResponse || {};
-    var candidates = [
-      c.booked && c.booked.start,
-      c.booked && c.booked.event && c.booked.event.start,
-      c.bookedSlot && c.bookedSlot.start,
-      c.slot && c.slot.start,
-      c.event && c.event.start,
-      c.event && c.event.start && c.event.start.dateTime,
-      c.start,
-      c.startISO,
-      c.when,
-      s.suggestion && s.suggestion.start,
-      s.start
-    ];
-    for (var i=0;i<candidates.length;i++){
-      var v = candidates[i];
-      if (v == null) continue;
-      if (typeof v === "number") return v;
-      if (typeof v === "string") return v;
-      if (typeof v === "object" && (v.dateTime|| (v.start && v.start.dateTime))) return v;
+      .then(function(r){ return r.text().then(function(t){ return{ok:r.ok,status:r.status,body:t}; }); })
+      .then(function(res){ console.log("[Booking-Mail] Response:", res); })
+      .catch(function(err){ console.error("[Booking-Mail] Fehler:", err); });
     }
-    return null;
-  }
 
-  async function suggestAndConfirmWithDetails(){
-    try {
-      const res = await fetch(CONFIG.API_BASE + "/api/calendar-suggest", { credentials:"include" });
-      const data = await res.json();
-
-      if (!data || !data.suggestion){
-        bubbleBot("Ich konnte gerade keinen passenden Termin vorschlagen. Möchten Sie alternativ über Calendly buchen?");
-        addButtons([{ label:"Calendly öffnen",onClick:function(){ window.open(CONFIG.CALENDLY,"_blank"); }, primary:true }]);
-        return;
+    /* ---------- Startzeit extrahieren ---------- */
+    function extractStartISO(suggestResponse,confirmResponse){
+      var s = suggestResponse || {};
+      var c = confirmResponse || {};
+      var candidates = [
+        c.booked && c.booked.start,
+        c.booked && c.booked.event && c.booked.event.start,
+        c.bookedSlot && c.bookedSlot.start,
+        c.slot && c.slot.start,
+        c.event && c.event.start,
+        c.event && c.event.start && c.event.start.dateTime,
+        c.start,
+        c.startISO,
+        c.when,
+        s.suggestion && s.suggestion.start,
+        s.start
+      ];
+      for (var i=0;i<candidates.length;i++){
+        var v = candidates[i];
+        if (v == null) continue;
+        if (typeof v === "number") return v;
+        if (typeof v === "string") return v;
+        if (typeof v === "object" && (v.dateTime|| (v.start && v.start.dateTime))) return v;
       }
+      return null;
+    }
 
-      const label =formatDateTimeDE(data.suggestion.start);
-      bubbleBot('Ich habe einen freien Termin gefunden: <strong>'+label+'</strong>. Soll ich den für Sie eintragen?');
-      addButtons([
-        { label:"Ja, bitte eintragen",primary:true, onClick: async function(){
-            try{
-              const r2 = await fetch(CONFIG.API_BASE + "/api/calendar-suggest?confirm=true", {
-                method: "POST",
-                headers: { "Content-Type":"application/json" },
-                credentials: "include",
-                body: JSON.stringify({
-                  contact: {
-                    name: booking.name || "",
-                    concern: booking.concern || "",
-                    phone: booking.phone || "",
-                    sourceUrl: location.href
-                  }
-                })
-              });
-              const d2 = await r2.json();
-              if (d2 && d2.booked){
-                var finalStart =extractStartISO(data, d2) ||data.suggestion.start;
-                sendBookingEmailViaSameAPI(finalStart);
-                bubbleBot("✅ Termin wurde in Ihrem Kalender erstellt. Wir melden uns bei Ihnen – danke!");
-              } else {
-                bubbleBot("Hmm, der Termin konnte nicht erstellt werden. Möchten Sie stattdessen über Calendly buchen?");
+    async function suggestAndConfirmWithDetails(){
+      try {
+        const res = await fetch(CONFIG.API_BASE + "/api/calendar-suggest", { credentials:"include" });
+        const data = await res.json();
+
+        if (!data || !data.suggestion){
+          bubbleBot("Ich konnte gerade keinen passenden Termin vorschlagen. Möchten Sie alternativ über Calendly buchen?");
+          addButtons([{ label:"Calendly öffnen",onClick:function(){ window.open(CONFIG.CALENDLY,"_blank"); }, primary:true }]);
+          return;
+        }
+
+        const label =formatDateTimeDE(data.suggestion.start);
+        bubbleBot('Ich habe einen freien Termin gefunden: <strong>'+label+'</strong>. Soll ich den für Sie eintragen?');
+        addButtons([
+          { label:"Ja, bitte eintragen",primary:true, onClick: async function(){
+              try{
+                const r2 = await fetch(CONFIG.API_BASE + "/api/calendar-suggest?confirm=true", {
+                  method: "POST",
+                  headers: { "Content-Type":"application/json" },
+                  credentials: "include",
+                  body: JSON.stringify({
+                    contact: {
+                      name: booking.name || "",
+                      concern: booking.concern || "",
+                      phone: booking.phone || "",
+                      sourceUrl: location.href
+                    }
+                  })
+                });
+                const d2 = await r2.json();
+                if (d2 && d2.booked){
+                  var finalStart =extractStartISO(data, d2) ||data.suggestion.start;
+                  sendBookingEmailViaSameAPI(finalStart);
+                  bubbleBot("✅ Termin wurde in Ihrem Kalender erstellt. Wir melden uns bei Ihnen – danke!");
+                } else {
+                  bubbleBot("Hmm, der Termin konnte nicht erstellt werden. Möchten Sie stattdessen über Calendly buchen?");
+                  addButtons([{ label:"Calendly öffnen", onClick:function(){window.open(CONFIG.CALENDLY, "_blank"); },primary:true }]);
+                }
+              } catch(e){
+                console.error(e);
+                bubbleBot("Es gab ein Problem beim Eintragen. Möchten Sie über Calendly buchen?");
                 addButtons([{ label:"Calendly öffnen", onClick:function(){window.open(CONFIG.CALENDLY, "_blank"); },primary:true }]);
               }
-            } catch(e){
-              console.error(e);
-              bubbleBot("Es gab ein Problem beim Eintragen. Möchten Sie über Calendly buchen?");
-              addButtons([{ label:"Calendly öffnen", onClick:function(){window.open(CONFIG.CALENDLY, "_blank"); },primary:true }]);
             }
-          }
-        },
-        { label:"Nein, anderer Vorschlag",onClick:function(){suggestAndConfirmWithDetails(); } }
-      ]);
-    } catch (err) {
-      console.error(err);
-      bubbleBot("Es gab ein Problem beim Abrufen eines Termins. Möchten Sie alternativ über Calendly buchen?");
-      addButtons([{ label:"Calendly öffnen",onClick:function(){ window.open(CONFIG.CALENDLY,"_blank"); }, primary:true }]);
-    }
-  }
-
-  /* Refresh */
-  var refreshBtn = $("#bf-refresh");
-  if (refreshBtn){ refreshBtn.onclick = function(){ clear(); clearSession();renderHome(); }; }
-
-  function scrollBottom(){
-    try { requestAnimationFrame(function(){requestAnimationFrame(function(){ try{body.scrollTo({ top: body.scrollHeight,behavior:"smooth" }); }catch(e){body.scrollTop=body.scrollHeight; } }); }); }
-    catch(e){ body.scrollTop=body.scrollHeight; }
-  }
-  function bubbleBot(html){ var r=document.createElement("div");r.className="bf-row bot"; r.innerHTML='<div class="bf-avatar">B</div><div class="bf-bubble bot">'+html+'</div>'; body.appendChild(r);scrollBottom(); }
-  function bubbleUser(text){ var r=document.createElement("div");r.className="bf-row user"; r.innerHTML='<div class="bf-bubble user">'+text+'</div>';body.appendChild(r); scrollBottom(); }
-
-  /* Eingabefeld mit klickbarem Enter-Button */
-  function showTextInput(opts){
-    var placeholder = typeof opts === 'string' ?opts : (opts && opts.placeholder) || 'Eingeben…';
-    var onSubmit = (opts && opts.onSubmit) || null;
-
-    var existing = body.querySelector('.bf-inputrow');
-    if(existing) existing.remove();
-
-    var row = document.createElement('div');
-    row.className = 'bf-inputrow';
-    row.innerHTML =
-      '<input type="text" class="bf-input" placeholder="'+placeholder+'">' +
-      '<button class="bf-inputsend" aria-label="Senden" title="Senden">↵</button>';
-
-    var input = row.querySelector('input');
-    var send  = row.querySelector('.bf-inputsend');
-
-    function submit(){
-      var val = (input.value || '').trim();
-      if(!val) return;
-      bubbleUser(val);
-      if (onSubmit){
-        var keep = !!onSubmit(val, input, row);
-        if (!keep) row.remove();
-      } else {
-        row.remove();
+          },
+          { label:"Nein, anderer Vorschlag",onClick:function(){suggestAndConfirmWithDetails(); } }
+        ]);
+      } catch (err) {
+        console.error(err);
+        bubbleBot("Es gab ein Problem beim Abrufen eines Termins. Möchten Sie alternativ über Calendly buchen?");
+        addButtons([{ label:"Calendly öffnen",onClick:function(){ window.open(CONFIG.CALENDLY,"_blank"); }, primary:true }]);
       }
     }
 
-    input.addEventListener('keydown',function(e){
-      if(e.key === 'Enter'){
-        e.preventDefault();
-        submit();
-      }
-    });
-    send.addEventListener('click', submit);
+    /* Refresh */
+    var refreshBtn = $("#bf-refresh");
+    if (refreshBtn){ refreshBtn.onclick = function(){ clear(); clearSession();renderHome(); }; }
 
-    function toggle(){
-      send.disabled = !(input.value && input.value.trim().length);
+    function scrollBottom(){
+      try { requestAnimationFrame(function(){requestAnimationFrame(function(){ try{body.scrollTo({ top: body.scrollHeight,behavior:"smooth" }); }catch(e){body.scrollTop=body.scrollHeight; } }); }); }
+      catch(e){ body.scrollTop=body.scrollHeight; }
     }
-    input.addEventListener('input', toggle);
-    toggle();
+    function bubbleBot(html){ var r=document.createElement("div");r.className="bf-row bot"; r.innerHTML='<div class="bf-avatar">B</div><div class="bf-bubble bot">'+html+'</div>'; body.appendChild(r);scrollBottom(); }
+    function bubbleUser(text){ var r=document.createElement("div");r.className="bf-row user"; r.innerHTML='<div class="bf-bubble user">'+text+'</div>';body.appendChild(r); scrollBottom(); }
 
-    body.appendChild(row);
-    scrollBottom();
-    setTimeout(function(){ input.focus(); }, 0);
-  }
+    /* Eingabefeld mit klickbarem Enter-Button */
+    function showTextInput(opts){
+      var placeholder = typeof opts === 'string' ?opts : (opts && opts.placeholder) || 'Eingeben…';
+      var onSubmit = (opts && opts.onSubmit) || null;
 
-  function addButtons(items){
-    var wrap=document.createElement("div");wrap.className="bf-buttons";
-    items.forEach(function(i){
-      var b=document.createElement("button");
-      b.className="bf-btn"+(i.primary?' primary':'');
-      b.textContent=i.label;
+      var existing = body.querySelector('.bf-inputrow');
+      if(existing) existing.remove();
 
-      var handler=function(e){
-        if (e && e.stopPropagation)e.stopPropagation();
-        b.classList.add("chosen");
-        if(i.echoUser!==false)bubbleUser(i.label);
-        if(i.onClick) i.onClick();
-        if (i.label && i.label.trim().toLowerCase() === 'zurück zum hauptmenü') {
-          panel.classList.add('open');
+      var row = document.createElement('div');
+      row.className = 'bf-inputrow';
+      row.innerHTML =
+        '<input type="text" class="bf-input" placeholder="'+placeholder+'">' +
+        '<button class="bf-inputsend" aria-label="Senden" title="Senden">↵</button>';
+
+      var input = row.querySelector('input');
+      var send  = row.querySelector('.bf-inputsend');
+
+      function submit(){
+        var val = (input.value || '').trim();
+        if(!val) return;
+        bubbleUser(val);
+        if (onSubmit){
+          var keep = !!onSubmit(val, input, row);
+          if (!keep) row.remove();
+        } else {
+          row.remove();
         }
-      };
-
-      var idx=CB.push(handler)-1;b.setAttribute("data-cb", String(idx));b.addEventListener("click", handler);
-      wrap.appendChild(b);
-    });
-    body.appendChild(wrap); scrollBottom();
-  }
-
-  function rebindInteractive(){
-    var btns = body.querySelectorAll(".bf-btn[data-cb]");
-    for (var k=0;k<btns.length;k++){
-      var btn=btns[k]; if(btn._bound) continue;
-      var id=parseInt(btn.getAttribute("data-cb")||"-1",10);
-      if(!isNaN(id) && CB[id]){btn.addEventListener("click", CB[id]);btn._bound=true; }
-    }
-  }
-
-  /* ==== FAQ: robustes Binding via Event-Delegation ==== */
-  document.addEventListener('change',function(e){
-    if (e.target && e.target.matches('.bf-faq')) {
-      handleFAQChange.call(e.target, e);
-    }
-  });
-
-  function handleFAQChange(){
-    var idx=parseInt(this.value,10),opt=CONFIG.FAQ_OPTIONS[idx]; if(!opt) return;
-    bubbleUser(opt.label);
-    bubbleBot(opt.answer);
-    addButtons([
-      {label:"Weitere FAQ auswählen",onClick:viewFAQ, primary:true},
-      {label:'Zurück zum Hauptmenü',onClick:renderHome}
-    ]);
-  }
-
-  function clear(){ body.innerHTML=""; }
-
-  /* ---------------- VIEWS ---------------- */
-  function renderHome(){
-    clear();
-    bubbleBot(CONFIG.GREETING.replace(/\n/g,"<br>"));
-    bubbleBot("<strong>Wobei kann ich Ihnen helfen?</strong>");
-    addButtons([
-      { label:"Häufige Fragen (FAQ)",onClick:viewFAQ },
-      { label:"Möchten Sie ein Angebot?",onClick:viewOffer, primary:true },
-      { label:"Über den Stall",onClick:viewAbout }
-    ]);
-  }
-
-  /* ---- Über den Stall ---- */
-  function backButtons(){
-    addButtons([
-      { label:"Zurück zum Hauptmenü",onClick:renderHome },
-      { label:'Zurück zum "Über den Stall" Menü', onClick:viewAbout },
-      { label:"Das wäre alles, Dankeschön",onClick:function(){ bubbleBot("Sehr gerne! Wenn Sie später Fragen haben, bin ich hier. 😊"); } }
-    ]);
-  }
-  function viewAbout(){
-    bubbleBot("Dieser Teil erzählt vom Stall. 😊");
-    bubbleBot("Hallo! 👋<br>Schön, dass Sie hier sind. Ich helfe Ihnen gerne dabei, mehr über unseren Hof zu erfahren.<br><br>Was möchten Sie wissen? 🐎");
-    viewAboutMenu();
-  }
-  function viewAboutMenu(){
-    addButtons([
-      { label:"Unsere Boxen",onClick:showMission },
-      { label:"Unser Service",onClick:showService },
-      { label:"Vorteile für Pferde",onClick:showBenefits }
-    ]);
-  }
-  function showMission(){
-    bubbleBot("<strong>Unsere Boxen 🎯</strong><br><br>Wir bieten sichere, saubere Boxen für Voll- und Halbpension. Alles für das Wohlbefinden Ihres Pferdes.");
-    backButtons();
-  }
-  function showService(){
-    bubbleBot("<strong>Unser Service 🤖</strong><br><br>24/7 Support, Futter, Pflege und Koppelzugriff – alles inklusive.");
-    backButtons();
-  }
-  function showBenefits(){
-    bubbleBot("<strong>Vorteile für Pferde✨</strong><br><br>Grüne Koppeln, Reithalle und Tierarzt-Standby – für gesunde Pferde.");
-    backButtons();
-  }
-
-  /* ============== Angebot / Lead-Erfassung ============== */
-  function viewOffer(){
-    bubbleBot("Bevor wir fortfahren, habe ich ein paar kurze Fragen, um sicherzustellen, dass unser Stall optimal zu Ihnen passt.<br><br><strong>Welche Art von Stall suchen Sie?</strong>");
-    showTextInput({
-      placeholder: "z. B. Vollpension, Halbpension, Offenstall …",
-      onSubmit: function(val){
-        lead.company = val;
-        leadIntro();
-        return false;
       }
-    });
-  }
 
-  function leadIntro(){
-    bubbleBot("Das klingt, als würden Sie sehr gut zu uns passen! 🐎<br><br>Gerne nehmen wir Ihre Kontaktdaten auf, um Ihnen Infos zu schicken.");
-    bubbleBot("Nennen Sie mir bitte Ihren Vor- und Nachnamen.");
-    askForNameThenEmailAndFeatures();
-  }
+      input.addEventListener('keydown',function(e){
+        if(e.key === 'Enter'){
+          e.preventDefault();
+          submit();
+        }
+      });
+      send.addEventListener('click', submit);
 
-  function askForNameThenEmailAndFeatures(){
-    showTextInput({
-      placeholder:"Vor- und Nachnamen eingeben…",
-      onSubmit:function(name, input, row){
-        lead.name = name;
-        row.remove();
-        bubbleBot("Nennen Sie mir bitte Ihre E-Mail Adresse.");
-        showTextInput({
-          placeholder:"E-Mail Adresse eingeben…",
-          onSubmit:function(email, input2, row2){
-            lead.email = email;
-            row2.remove();
+      function toggle(){
+        send.disabled = !(input.value && input.value.trim().length);
+      }
+      input.addEventListener('input', toggle);
+      toggle();
 
-            bubbleBot("Sagen Sie mir in Stichpunkten, welche Funktionen Ihrem Pferd helfen würden.");
-            showTextInput({
-              placeholder:"Funktionen (Stichpunkte) eingeben…",
-              onSubmit:function(features,input3, row3){
-                lead.features = features;
-                sendLeadEmail();
-                bubbleBot("Okay, vielen Dank 🐎. Unser Team wird sich innerhalb von 24 Stunden bei Ihnen melden. Brauchen Sie noch meine Hilfe bei etwas anderem😀?");
-                row3.remove();
-                addButtons([
-                  { label:"Ja. Zurück zum Hauptmenü.", onClick:renderHome, primary:true },
-                  { label:"Nein. Danke für deine Hilfe.", onClick:function(){ bubbleBot("Sehr gerne! Wenn Sie später Fragen haben, bin ich hier. 😊"); } }
-                ]);
-                return false;
-              }
-            });
-            return false;
+      body.appendChild(row);
+      scrollBottom();
+      setTimeout(function(){ input.focus(); }, 0);
+    }
+
+    function addButtons(items){
+      var wrap=document.createElement("div");wrap.className="bf-buttons";
+      items.forEach(function(i){
+        var b=document.createElement("button");
+        b.className="bf-btn"+(i.primary?' primary':'');
+        b.textContent=i.label;
+
+        var handler=function(e){
+          if (e && e.stopPropagation)e.stopPropagation();
+          b.classList.add("chosen");
+          if(i.echoUser!==false)bubbleUser(i.label);
+          if(i.onClick) i.onClick();
+          if (i.label && i.label.trim().toLowerCase() === 'zurück zum hauptmenü') {
+            panel.classList.add('open');
           }
-        });
-        return false;
+        };
+
+        var idx=CB.push(handler)-1;b.setAttribute("data-cb", String(idx));b.addEventListener("click", handler);
+        wrap.appendChild(b);
+      });
+      body.appendChild(wrap); scrollBottom();
+    }
+
+    function rebindInteractive(){
+      var btns = body.querySelectorAll(".bf-btn[data-cb]");
+      for (var k=0;k<btns.length;k++){
+        var btn=btns[k]; if(btn._bound) continue;
+        var id=parseInt(btn.getAttribute("data-cb")||"-1",10);
+        if(!isNaN(id) && CB[id]){btn.addEventListener("click", CB[id]);btn._bound=true; }
+      }
+    }
+
+    /* ==== FAQ: robustes Binding via Event-Delegation ==== */
+    document.addEventListener('change',function(e){
+      if (e.target && e.target.matches('.bf-faq')) {
+        handleFAQChange.call(e.target, e);
       }
     });
-  }
 
-  function sendLeadEmail(){
-    var ENDPOINT = CONFIG.API_BASE + '/api/send-lead';
-    var companyClean = (lead.company || '').toString().trim();
-    fetch(ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify({
-        name:     (lead.name     || ''),
-        email:    (lead.email    || ''),
-        features: (lead.features || ''),
-        company:  companyClean,
-        business: companyClean,
-        company_label: companyClean,
-        challenge:(lead.challenge|| '')
-      })
-    })
-    .then(function(r){ return r.text().then(function(t){ return{ok:r.ok,status:r.status,body:t}; }); })
-    .then(function(res){ console.log('Lead versendet:', res); })
-    .catch(function(err){ console.error('Fehler beim Versenden:', err); });
-  }
-
-  function viewFAQ(){
-    bubbleBot("Hier sind häufige Fragen zum Stall. Wählen Sie eine aus!");
-    var row=document.createElement("div");
-    row.className="bf-row bot";
-    row.innerHTML=
-      '<div class="bf-avatar">B</div>'+
-      '<div class="bf-bubble bot">'+
-        '<div>Worüber möchten Sie mehr erfahren? 🤔</div>'+
-        '<div class="bf-select-wrap">'+
-          '<select class="bf-select bf-faq">'+
-            '<option value="" disabled selected>Frage wählen…</option>'+
-            CONFIG.FAQ_OPTIONS.map(function(o,i){return '<option value="'+i+'">'+o.label+'</option>';}).join("")+
-          '</select>'+
-        '</div>'+
-      '</div>';
-    body.appendChild(row); scrollBottom();
-  }
-
-  function showBadgeOnce(){
-    if(!CONFIG.SHOW_BADGE_ON_LOAD) return;
-    try{
-      if(sessionStorage.getItem(CONFIG.BADGE_SESSION_KEY)) return;
-      badge.classList.add("show");
-      sessionStorage.setItem(CONFIG.BADGE_SESSION_KEY,"1");
-      setTimeout(function(){badge.classList.remove("show"); }, 9000);
-    }catch(e){
-      badge.classList.add("show");
-      setTimeout(function(){badge.classList.remove("show"); }, 9000);
+    function handleFAQChange(){
+      var idx=parseInt(this.value,10),opt=CONFIG.FAQ_OPTIONS[idx]; if(!opt) return;
+      bubbleUser(opt.label);
+      bubbleBot(opt.answer);
+      addButtons([
+        {label:"Weitere FAQ auswählen",onClick:viewFAQ, primary:true},
+        {label:'Zurück zum Hauptmenü',onClick:renderHome}
+      ]);
     }
-  }
-  window.addEventListener("load",showBadgeOnce);
 
-  document.addEventListener("click", function(e){
-    var panelOpen =panel.classList.contains("open");
-    if(panelOpen && !panel.contains(e.target) && !openB.contains(e.target)) closePanel();
-  });
-  document.addEventListener("keydown",function(e){
-    if(e.key === "Escape" &&panel.classList.contains("open")) closePanel();
-  });
+    function clear(){ body.innerHTML=""; }
 
-  /* kleine Utility für sichere Anzeige */
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g,function(m){
-      return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m];
+    /* ---------------- VIEWS ---------------- */
+    function renderHome(){
+      clear();
+      bubbleBot(CONFIG.GREETING.replace(/\n/g,"<br>"));
+      bubbleBot("<strong>Wobei kann ich Ihnen helfen?</strong>");
+      addButtons([
+        { label:"Häufige Fragen (FAQ)",onClick:viewFAQ },
+        { label:"Möchten Sie ein Angebot?",onClick:viewOffer, primary:true },
+        { label:"Über den Stall",onClick:viewAbout }
+      ]);
+    }
+
+    /* ---- Über den Stall ---- */
+    function backButtons(){
+      addButtons([
+        { label:"Zurück zum Hauptmenü",onClick:renderHome },
+        { label:'Zurück zum "Über den Stall" Menü', onClick:viewAbout },
+        { label:"Das wäre alles, Dankeschön",onClick:function(){ bubbleBot("Sehr gerne! Wenn Sie später Fragen haben, bin ich hier. 😊"); } }
+      ]);
+    }
+    function viewAbout(){
+      bubbleBot("Dieser Teil erzählt vom Stall. 😊");
+      bubbleBot("Hallo! 👋<br>Schön, dass Sie hier sind. Ich helfe Ihnen gerne dabei, mehr über unseren Hof zu erfahren.<br><br>Was möchten Sie wissen? 🐎");
+      viewAboutMenu();
+    }
+    function viewAboutMenu(){
+      addButtons([
+        { label:"Unsere Boxen",onClick:showMission },
+        { label:"Unser Service",onClick:showService },
+        { label:"Vorteile für Pferde",onClick:showBenefits }
+      ]);
+    }
+    function showMission(){
+      bubbleBot("<strong>Unsere Boxen 🎯</strong><br><br>Wir bieten sichere, saubere Boxen für Voll- und Halbpension. Alles für das Wohlbefinden Ihres Pferdes.");
+      backButtons();
+    }
+    function showService(){
+      bubbleBot("<strong>Unser Service 🤖</strong><br><br>24/7 Support, Futter, Pflege und Koppelzugriff – alles inklusive.");
+      backButtons();
+    }
+    function showBenefits(){
+      bubbleBot("<strong>Vorteile für Pferde✨</strong><br><br>Grüne Koppeln, Reithalle und Tierarzt-Standby – für gesunde Pferde.");
+      backButtons();
+    }
+
+    /* ============== Angebot / Lead-Erfassung ============== */
+    function viewOffer(){
+      bubbleBot("Bevor wir fortfahren, habe ich ein paar kurze Fragen, um sicherzustellen, dass unser Stall optimal zu Ihnen passt.<br><br><strong>Welche Art von Stall suchen Sie?</strong>");
+      showTextInput({
+        placeholder: "z. B. Vollpension, Halbpension, Offenstall …",
+        onSubmit: function(val){
+          lead.company = val;
+          leadIntro();
+          return false;
+        }
+      });
+    }
+
+    function leadIntro(){
+      bubbleBot("Das klingt, als würden Sie sehr gut zu uns passen! 🐎<br><br>Gerne nehmen wir Ihre Kontaktdaten auf, um Ihnen Infos zu schicken.");
+      bubbleBot("Nennen Sie mir bitte Ihren Vor- und Nachnamen.");
+      askForNameThenEmailAndFeatures();
+    }
+
+    function askForNameThenEmailAndFeatures(){
+      showTextInput({
+        placeholder:"Vor- und Nachnamen eingeben…",
+        onSubmit:function(name, input, row){
+          lead.name = name;
+          row.remove();
+          bubbleBot("Nennen Sie mir bitte Ihre E-Mail Adresse.");
+          showTextInput({
+            placeholder:"E-Mail Adresse eingeben…",
+            onSubmit:function(email, input2, row2){
+              lead.email = email;
+              row2.remove();
+
+              bubbleBot("Sagen Sie mir in Stichpunkten, welche Funktionen Ihrem Pferd helfen würden.");
+              showTextInput({
+                placeholder:"Funktionen (Stichpunkte) eingeben…",
+                onSubmit:function(features,input3, row3){
+                  lead.features = features;
+                  sendLeadEmail();
+                  bubbleBot("Okay, vielen Dank 🐎. Unser Team wird sich innerhalb von 24 Stunden bei Ihnen melden. Brauchen Sie noch meine Hilfe bei etwas anderem😀?");
+                  row3.remove();
+                  addButtons([
+                    { label:"Ja. Zurück zum Hauptmenü.", onClick:renderHome, primary:true },
+                    { label:"Nein. Danke für deine Hilfe.", onClick:function(){ bubbleBot("Sehr gerne! Wenn Sie später Fragen haben, bin ich hier. 😊"); } }
+                  ]);
+                  return false;
+                }
+              });
+              return false;
+            }
+          });
+          return false;
+        }
+      });
+    }
+
+    function sendLeadEmail(){
+      var ENDPOINT = CONFIG.API_BASE + '/api/send-lead';
+      var companyClean = (lead.company || '').toString().trim();
+      fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          name:     (lead.name     || ''),
+          email:    (lead.email    || ''),
+          features: (lead.features || ''),
+          company:  companyClean,
+          business: companyClean,
+          company_label: companyClean,
+          challenge:(lead.challenge|| '')
+        })
+      })
+      .then(function(r){ return r.text().then(function(t){ return{ok:r.ok,status:r.status,body:t}; }); })
+      .then(function(res){ console.log('Lead versendet:', res); })
+      .catch(function(err){ console.error('Fehler beim Versenden:', err); });
+    }
+
+    function viewFAQ(){
+      bubbleBot("Hier sind häufige Fragen zum Stall. Wählen Sie eine aus!");
+      var row=document.createElement("div");
+      row.className="bf-row bot";
+      row.innerHTML=
+        '<div class="bf-avatar">B</div>'+
+        '<div class="bf-bubble bot">'+
+          '<div>Worüber möchten Sie mehr erfahren? 🤔</div>'+
+          '<div class="bf-select-wrap">'+
+            '<select class="bf-select bf-faq">'+
+              '<option value="" disabled selected>Frage wählen…</option>'+
+              CONFIG.FAQ_OPTIONS.map(function(o,i){return '<option value="'+i+'">'+o.label+'</option>';}).join("")+
+            '</select>'+
+          '</div>'+
+        '</div>';
+      body.appendChild(row); scrollBottom();
+    }
+
+    function showBadgeOnce(){
+      if(!CONFIG.SHOW_BADGE_ON_LOAD) return;
+      try{
+        if(sessionStorage.getItem(CONFIG.BADGE_SESSION_KEY)) return;
+        badge.classList.add("show");
+        sessionStorage.setItem(CONFIG.BADGE_SESSION_KEY,"1");
+        setTimeout(function(){badge.classList.remove("show"); }, 9000);
+      }catch(e){
+        badge.classList.add("show");
+        setTimeout(function(){badge.classList.remove("show"); }, 9000);
+      }
+    }
+    window.addEventListener("load",showBadgeOnce);
+
+    document.addEventListener("click", function(e){
+      var panelOpen =panel.classList.contains("open");
+      if(panelOpen && !panel.contains(e.target) && !openB.contains(e.target)) closePanel();
     });
-  }
-})();
-</script>
+    document.addEventListener("keydown",function(e){
+      if(e.key === "Escape" &&panel.classList.contains("open")) closePanel();
+    });
+
+    /* kleine Utility für sichere Anzeige */
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g,function(m){
+        return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m];
+      });
+    }
+  })();
+  </script>
+</body>
+</html>
