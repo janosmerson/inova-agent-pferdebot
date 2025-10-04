@@ -9,20 +9,20 @@
   <h1>Willkommen im Stall</h1>
   <p>Klick unten rechts für den Bot-Assistenten!</p>
 
-  <!-- InovaAgent Chat Widget – kleinere Buttons, Shopify-stabil (fehlerfrei, Minimal-Modus) -->
+  <!-- InovaAgent Chat Widget – kleinere Buttons, Shopify-stabil (Voll-Modus, Input fix) -->
   <script>
   (function(){
-    /* ---------------- CONFIG (pferde-spezifisch, Minimal-Modus) ---------------- */
+    /* ---------------- CONFIG ---------------- */
     var CONFIG = {
       BRAND: "Alex – Pferdepensionsstall Assistent",
-      SUBTITLE: "Nur für Mitglieder: Koppelstatus prüfen. Passwort vom Stallbesitzer.",
+      SUBTITLE: "Ich helfe bei Stall-Fragen: Boxen, Termine, Koppelstatus & mehr. Lass uns starten!",
       WIDGET_SIDE: "right",
       BADGE_TEXT: "Neue Nachricht • Jetzt ansehen",
-      GREETING: "Hallo, ich bin Alex. Willkommen im Mitgliederbereich! 🐎\nGib dein Passwort ein, um den Koppelstatus zu sehen.",
-      CALENDLY: "https://calendly.com/DEIN-STALL/30min",  // Deinen Link
-      EMAIL: "info@dein-stall.de",  // Deine E-Mail
+      GREETING: "Hallo, ich bin Alex. Willkommen im Stall! 🐎\nFragen zu Boxen, Terminen oder Koppel? Ich helfe 24/7.\nProbier's aus!",
+      CALENDLY: "https://calendly.com/DEIN-STALL/30min",
+      EMAIL: "info@dein-stall.de",
       WHATSAPP: "https://wa.me/49170DEINNUMMER?text=Hi%2C%20ich%20habe%20eine%20Frage%20zum%20STALL.",
-      API_BASE: "https://deine-vercel-app.vercel.app/api",  // Deine Vercel-URL /api
+      API_BASE: "https://api.bot-flow.net",
       SHOW_BADGE_ON_LOAD: true,
       BADGE_SESSION_KEY: "bf_badge_shown",
       z: 2147483000,
@@ -338,7 +338,7 @@ Ihr Bot-Assistent`;
     function bubbleBot(html){ var r=document.createElement("div");r.className="bf-row bot"; r.innerHTML='<div class="bf-avatar">B</div><div class="bf-bubble bot">'+html+'</div>'; body.appendChild(r);scrollBottom(); }
     function bubbleUser(text){ var r=document.createElement("div");r.className="bf-row user"; r.innerHTML='<div class="bf-bubble user">'+text+'</div>';body.appendChild(r); scrollBottom(); }
 
-    /* Eingabefeld mit klickbarem Enter-Button */
+    /* Eingabefeld mit klickbarem Enter-Button (fix: Dynamisches <input> für Koppelstatus) */
     function showTextInput(opts){
       var placeholder = typeof opts === 'string' ?opts : (opts && opts.placeholder) || 'Eingeben…';
       var onSubmit = (opts && opts.onSubmit) || null;
@@ -437,82 +437,182 @@ Ihr Bot-Assistent`;
 
     function clear(){ body.innerHTML=""; }
 
-    /* ---------------- VIEWS ---------------- */
+    /* ---------------- VIEWS (Voll-Modus: Alle Buttons) ---------------- */
     function renderHome(){
       clear();
       bubbleBot(CONFIG.GREETING.replace(/\n/g,"<br>"));
       bubbleBot("<strong>Wobei kann ich Ihnen helfen?</strong>");
       addButtons([
-        { label:"Koppelstatus (Mitglieder)",onClick:viewPaddockStatus },  // Minimal-Modus: Nur das
-        { label:"Schließen",onClick:closePanel }
+        { label:"Häufige Fragen (FAQ)",onClick:viewFAQ },
+        { label:"Möchten Sie ein Angebot?",onClick:viewOffer, primary:true },
+        { label:"Über den Stall",onClick:viewAbout },
+        { label:"Koppelstatus (Mitglieder)",onClick:viewPaddockStatus }
       ]);
     }
 
-    /* ---- Koppelstatus-Flow (Minimal-Modus) ---- */
+    /* Koppelstatus-Flow (Input-Feld fix: Dynamisches <input> + PW-Fetch) */
     function viewPaddockStatus() {
-      showText('Mitgliederbereich: Gib dein Passwort ein, um den Koppelstatus zu sehen. (Nur für Stall-Mitglieder – kontaktiere den Besitzer bei Problemen.)', true);  // Input-Modus
-  
-      const input = document.querySelector('.bf-input, input[type="text"]');  // Passe Selector an
-      if (input) {
-        input.type = 'password';
-        input.placeholder = 'Mitglieder-Passwort eingeben';
-  
-        const handleEnter = async (e) => {
-          if (e.key === 'Enter') {
-            const password = input.value;
-            try {
-              const response = await fetch('/api/auth-member', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password })
-              });
-              const data = await response.json();
-  
-              if (data.authenticated) {
-                // Auth OK: Status laden
-                const statusRes = await fetch('/api/paddock-status');
-                const status = await statusRes.json();
-                showText(`Koppelstatus: ${status.status === 'open' ? '🟢 Offen' : '🔴 Geschlossen'} (Letzte Änderung: ${new Date(status.updatedAt).toLocaleDateString('de-DE')}).`, false);
-  
-                addButtons([{ label: 'Logout & Home', onClick: () => { renderHome(); input.removeEventListener('keypress', handleEnter); } }]);
-              } else {
-                showText('❌ Falsches Passwort. Nur autorisierte Mitglieder haben Zugriff. Keine E-Mail-Option – kontaktiere den Stallbesitzer direkt.', false);
-                addButtons([{ label: 'Zurück', onClick: renderHome }]);
-              }
-            } catch (error) {
-              showText('Verbindungsfehler – versuche es später nochmal.', false);
+      bubbleBot("Mitgliederbereich: Gib dein Passwort ein, um den Koppelstatus zu sehen. (Nur für Stall-Mitglieder – kontaktiere den Besitzer bei Problemen.)");
+      showTextInput({
+        placeholder: "Mitglieder-Passwort eingeben",
+        onSubmit: async function(password) {
+          try {
+            const response = await fetch('/api/auth-member', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ password })
+            });
+            const data = await response.json();
+
+            if (data.authenticated) {
+              // Auth OK: Status laden
+              const statusRes = await fetch('/api/paddock-status');
+              const status = await statusRes.json();
+              bubbleBot(`Koppelstatus: ${status.status === 'open' ? '🟢 Offen' : '🔴 Geschlossen'} (Letzte Änderung: ${new Date(status.updatedAt).toLocaleDateString('de-DE')}).`);
+              addButtons([{ label: 'Logout & Home', onClick: renderHome }]);
+            } else {
+              bubbleBot('❌ Falsches Passwort. Nur autorisierte Mitglieder haben Zugriff. Keine E-Mail-Option – kontaktiere den Stallbesitzer direkt.');
               addButtons([{ label: 'Zurück', onClick: renderHome }]);
             }
-            input.value = '';  // Clear
+          } catch (error) {
+            bubbleBot('Verbindungsfehler – versuche es später nochmal. (API offline – Stallbesitzer kontaktieren.)');
+            addButtons([{ label: 'Zurück', onClick: renderHome }]);
           }
-        };
-        input.addEventListener('keypress', handleEnter);
-      } else {
-        showText('Fehler: Input-Feld nicht gefunden. Lade die Seite neu.', false);
-      }
+          return false;  // Input behalten
+        }
+      });
     }
 
-    /* ---- Andere Views (deaktiviert im Minimal-Modus) ---- */
-    function viewFAQ(){ showText('FAQ: Kosten ab 350€. Mehr?'); addButtons([{label:'Home', onClick:renderHome}]); }
-    function viewOffer(){ showText('Angebot: Name/E-Mail eingeben.'); addButtons([{label:'Home', onClick:renderHome}]); }
-    function viewBooking(){ showText('Termin: Wähle Datum.'); addButtons([{label:'Home', onClick:renderHome}]); }
+    /* ---- Andere Views (Voll-Modus) ---- */
+    function viewFAQ(){
+      bubbleBot("Hier sind häufige Fragen zum Stall. Wählen Sie eine aus!");
+      var row=document.createElement("div");
+      row.className="bf-row bot";
+      row.innerHTML=
+        '<div class="bf-avatar">B</div>'+
+        '<div class="bf-bubble bot">'+
+          '<div>Worüber möchten Sie mehr erfahren? 🤔</div>'+
+          '<div class="bf-select-wrap">'+
+            '<select class="bf-select bf-faq">'+
+              '<option value="" disabled selected>Frage wählen…</option>'+
+              CONFIG.FAQ_OPTIONS.map(function(o,i){return '<option value="'+i+'">'+o.label+'</option>';}).join("")+
+            '</select>'+
+          '</div>'+
+        '</div>';
+      body.appendChild(row); scrollBottom();
+    }
 
-    /* ---- Über den Stall (deaktiviert) ---- */
-    function backButtons(){ addButtons([{ label:"Zurück zum Hauptmenü",onClick:renderHome }]); }
-    function viewAbout(){ showText('Über den Stall: Sichere Boxen und Pflege für Ihr Pferd.'); backButtons(); }
-    function viewAboutMenu(){ addButtons([{ label:"Unsere Boxen",onClick:backButtons }]); }
-    function showMission(){ showText('Unsere Boxen: Vollpension ab 450€.'); backButtons(); }
-    function showService(){ showText('Service: 24/7 Pflege.'); backButtons(); }
-    function showBenefits(){ showText('Vorteile: Grüne Koppeln.'); backButtons(); }
+    function viewOffer(){
+      bubbleBot("Bevor wir fortfahren, habe ich ein paar kurze Fragen, um sicherzustellen, dass unser Stall optimal zu Ihnen passt.<br><br><strong>Welche Art von Stall suchen Sie?</strong>");
+      showTextInput({
+        placeholder: "z. B. Vollpension, Halbpension, Offenstall …",
+        onSubmit: function(val){
+          lead.company = val;
+          leadIntro();
+          return false;
+        }
+      });
+    }
 
-    /* ============== Angebot / Lead-Erfassung (deaktiviert) ============== */
-    function viewOfferDisabled(){ showText('Angebot: Coming soon.'); addButtons([{label:'Home', onClick:renderHome}]); }
-    function leadIntro(){ showText('Lead: Coming soon.'); addButtons([{label:'Home', onClick:renderHome}]); }
-    function askForNameThenEmailAndFeatures(){ showText('Name: Coming soon.'); addButtons([{label:'Home', onClick:renderHome}]); }
-    function sendLeadEmail(){ console.log('Lead versendet (Demo).'); }
-    function showOtherCompanyChallenge(){ showText('Challenge: Coming soon.'); addButtons([{label:'Home', onClick:renderHome}]); }
-    function challengeIntroThenName(){ showText('Challenge: Coming soon.'); addButtons([{label:'Home', onClick:renderHome}]); }
-    function askCompanyFromFreeQuestion(){ showText('Company: Coming soon.'); addButtons([{label:'Home', onClick:renderHome}]); }
+    function leadIntro(){
+      bubbleBot("Das klingt, als würden Sie sehr gut zu uns passen! 🐎<br><br>Gerne nehmen wir Ihre Kontaktdaten auf, um Ihnen Infos zu schicken.");
+      bubbleBot("Nennen Sie mir bitte Ihren Vor- und Nachnamen.");
+      askForNameThenEmailAndFeatures();
+    }
+
+    function askForNameThenEmailAndFeatures(){
+      showTextInput({
+        placeholder:"Vor- und Nachnamen eingeben…",
+        onSubmit:function(name, input, row){
+          lead.name = name;
+          row.remove();
+          bubbleBot("Nennen Sie mir bitte Ihre E-Mail Adresse.");
+          showTextInput({
+            placeholder:"E-Mail Adresse eingeben…",
+            onSubmit:function(email, input2, row2){
+              lead.email = email;
+              row2.remove();
+
+              bubbleBot("Sagen Sie mir in Stichpunkten, welche Funktionen Ihrem Pferd helfen würden.");
+              showTextInput({
+                placeholder:"Funktionen (Stichpunkte) eingeben…",
+                onSubmit:function(features,input3, row3){
+                  lead.features = features;
+                  sendLeadEmail();
+                  bubbleBot("Okay, vielen Dank 🐎. Unser Team wird sich innerhalb von 24 Stunden bei Ihnen melden. Brauchen Sie noch meine Hilfe bei etwas anderem😀?");
+                  row3.remove();
+                  addButtons([
+                    { label:"Ja. Zurück zum Hauptmenü.", onClick:renderHome, primary:true },
+                    { label:"Nein. Danke für deine Hilfe.", onClick:function(){ bubbleBot("Sehr gerne! Wenn Sie später Fragen haben, bin ich hier. 😊"); } }
+                  ]);
+                  return false;
+                }
+              });
+              return false;
+            }
+          });
+          return false;
+        }
+      });
+    }
+
+    function sendLeadEmail(){
+      var ENDPOINT = CONFIG.API_BASE + '/api/send-lead';
+      var companyClean = (lead.company || '').toString().trim();
+      fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          name:     (lead.name     || ''),
+          email:    (lead.email    || ''),
+          features: (lead.features || ''),
+          company:  companyClean,
+          business: companyClean,
+          company_label: companyClean,
+          challenge:(lead.challenge|| '')
+        })
+      })
+      .then(function(r){ return r.text().then(function(t){ return{ok:r.ok,status:r.status,body:t}; }); })
+      .then(function(res){ console.log('Lead versendet:', res); })
+      .catch(function(err){ console.error('Fehler beim Versenden:', err); });
+    }
+
+    function viewAbout(){
+      bubbleBot("Dieser Teil erzählt vom Stall. 😊");
+      bubbleBot("Hallo! 👋<br>Schön, dass Sie hier sind. Ich helfe Ihnen gerne dabei, mehr über unseren Hof zu erfahren.<br><br>Was möchten Sie wissen? 🐎");
+      viewAboutMenu();
+    }
+
+    function viewAboutMenu(){
+      addButtons([
+        { label:"Unsere Boxen",onClick:showMission },
+        { label:"Unser Service",onClick:showService },
+        { label:"Vorteile für Pferde",onClick:showBenefits }
+      ]);
+    }
+
+    function showMission(){
+      bubbleBot("<strong>Unsere Boxen 🎯</strong><br><br>Wir bieten sichere, saubere Boxen für Voll- und Halbpension. Alles für das Wohlbefinden Ihres Pferdes.");
+      backButtons();
+    }
+
+    function showService(){
+      bubbleBot("<strong>Unser Service 🤖</strong><br><br>24/7 Support, Futter, Pflege und Koppelzugriff – alles inklusive.");
+      backButtons();
+    }
+
+    function showBenefits(){
+      bubbleBot("<strong>Vorteile für Pferde✨</strong><br><br>Grüne Koppeln, Reithalle und Tierarzt-Standby – für gesunde Pferde.");
+      backButtons();
+    }
+
+    function backButtons(){
+      addButtons([
+        { label:"Zurück zum Hauptmenü",onClick:renderHome },
+        { label:'Zurück zum "Über den Stall" Menü', onClick:viewAbout },
+        { label:"Das wäre alles, Dankeschön",onClick:function(){ bubbleBot("Sehr gerne! Wenn Sie später Fragen haben, bin ich hier. 😊"); } }
+      ]);
+    }
 
     /* Badge */
     function showBadgeOnce(){
@@ -537,21 +637,11 @@ Ihr Bot-Assistent`;
       if(e.key === "Escape" &&panel.classList.contains("open")) closePanel();
     });
 
-    /* Utility */
+    /* kleine Utility für sichere Anzeige */
     function escapeHtml(s){
       return String(s).replace(/[&<>"']/g,function(m){
         return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m];
       });
-    }
-
-    /* Minimal-Modus: Nur Koppelstatus */
-    function renderHome(){
-      clear();
-      bubbleBot(CONFIG.GREETING.replace(/\n/g,"<br>"));
-      addButtons([
-        { label:"Koppelstatus (Mitglieder)", onClick:viewPaddockStatus },
-        { label:"Schließen", onClick:closePanel }
-      ]);
     }
   })();
   </script>
