@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin – Stall-Management</title>
+  <style>
+    body { font-family: Arial; max-width: 600px; margin: 50px auto; padding: 20px; }
+    input, button, select { padding: 10px; margin: 10px 0; width: 100%; }
+    .hidden { display: none; }
+    .status { font-size: 1.2em; padding: 10px; border: 1px solid #ccc; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <h1>Admin-Konsole: Koppelstatus</h1>
+  <div id="login-form">
+    <input type="password" id="adminPw" placeholder="Admin-Passwort">
+    <button onclick="loginAdmin()">Einloggen</button>
+  </div>
+  <div id="dashboard" class="hidden">
+    <h2>Koppelstatus Steuern</h2>
+    <div class="status" id="currentStatus">Laden...</div>
+    <select id="newStatus">
+      <option value="open">🟢 Offen</option>
+      <option value="closed">🔴 Geschlossen</option>
+    </select>
+    <button onclick="updateStatus()">Status Ändern</button>
+    <h3>Mitglieder-Passwort Ändern</h3>
+    <input type="password" id="newMemberPw" placeholder="Neues Passwort">
+    <button onclick="updateMemberPw()">Speichern</button>
+    <h3>Logs (Demo)</h3>
+    <div id="logs">Demo: Letzter Zugriff: 04.10.2025</div>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script>
+    const ADMIN_PASSWORD = 'hofadmin2025';  // Dein Admin-PW (ändere in Prod)
+    let isLoggedIn = false;
+
+    async function loginAdmin() {
+      const pw = document.getElementById('adminPw').value;
+      if (pw === ADMIN_PASSWORD) {
+        isLoggedIn = true;
+        document.getElementById('login-form').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        await loadStatus();
+        loadLogs();
+      } else {
+        alert('Falsches Passwort!');
+      }
+    }
+
+    async function loadStatus() {
+      try {
+        const res = await fetch('/api/paddock-status');
+        const data = await res.json();
+        document.getElementById('currentStatus').innerHTML = `Status: ${data.status === 'open' ? '🟢 Offen' : '🔴 Geschlossen'}<br>Letzte Änderung: ${new Date(data.updatedAt).toLocaleString('de-DE')}`;
+        document.getElementById('newStatus').value = data.status;
+      } catch (e) {
+        document.getElementById('currentStatus').textContent = 'Fehler beim Laden.';
+      }
+    }
+
+    async function updateStatus() {
+      const status = document.getElementById('newStatus').value;
+      try {
+        const res = await fetch('/api/set-paddock-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status, adminPassword: ADMIN_PASSWORD })
+        });
+        if (res.ok) {
+          await loadStatus();
+          alert('Status aktualisiert!');
+        } else {
+          alert('Fehler beim Update.');
+        }
+      } catch (e) {
+        alert('Verbindungsfehler.');
+      }
+    }
+
+    async function updateMemberPw() {
+      const newPw = document.getElementById('newMemberPw').value;
+      if (!newPw) return alert('Passwort eingeben!');
+      try {
+        const res = await fetch('/api/set-member-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: newPw, adminPassword: ADMIN_PASSWORD })
+        });
+        if (res.ok) {
+          alert('Mitglieder-PW geändert! Teile es den Mitgliedern mit.');
+          document.getElementById('newMemberPw').value = '';
+        } else {
+          alert('Fehler beim Speichern.');
+        }
+      } catch (e) {
+        alert('Verbindungsfehler.');
+      }
+    }
+
+    function loadLogs() {
+      document.getElementById('logs').innerHTML = 'Demo-Log: Mitglied@example.com - 04.10.2025, 14:30 Uhr.';
+    }
+
+    function logout() {
+      isLoggedIn = false;
+      document.getElementById('dashboard').classList.add('hidden');
+      document.getElementById('login-form').classList.remove('hidden');
+      document.getElementById('adminPw').value = '';
+    }
+
+    document.getElementById('adminPw').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') loginAdmin();
+    });
+  </script>
+</body>
+</html>
